@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sudo chown:*)",
+      "Bash(sudo chmod:*)",
+      "Bash(chmod -R 777 /home/oscar/iespai/www/splaitmontserrat/data/)",
+      "Bash(ls /home/oscar/iespai/www/splaitmontserrat/*.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/includes/user.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/update_position.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/toggle_location.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/mapa.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/cartilla.php)",
+      "Bash(php8.2 -l /home/oscar/iespai/www/splaitmontserrat/includes/user.php)",
+      "Bash(php8.2 -l /home/oscar/iespai/www/splaitmontserrat/update_position.php)",
+      "Bash(php8.2 -l /home/oscar/iespai/www/splaitmontserrat/toggle_location.php)",
+      "Bash(php8.2 -l /home/oscar/iespai/www/splaitmontserrat/admin/mapa.php)",
+      "Bash(which php8* php7*)",
+      "Read(//usr/**)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/toggle_gps.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/dashboard.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/includes/config.php)"
+    ]
+  }
+}

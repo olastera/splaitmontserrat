@@ -1,0 +1,18 @@
+# Dades dels participants — MAI al git
+data/users/
+data/settings.json
+
+# Logs i temporals
+*.log
+*.tmp
+
+# Fitxers del sistema
+.DS_Store
+Thumbs.db
+
+# Logo pujat localment
+assets/img/logo_*
+
+# Editor
+.vscode/
+.idea/

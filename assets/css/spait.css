@@ -1,0 +1,400 @@
+/* =============================================
+   SPAI-T CAMINADA MONTSERRAT 2026 — CSS
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Open+Sans:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --spait-vermell: #C0392B;
+  --spait-verd:    #27AE60;
+  --spait-groc:    #F1C40F;
+  --spait-fosc:    #2C3E50;
+  --spait-blanc:   #FFFFFF;
+  --spait-vermell-clar: #e74c3c;
+  --spait-verd-clar: #2ecc71;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: var(--spait-fosc);
+}
+
+h1, h2, h3, h4, h5, h6,
+.navbar-brand, .display-1, .display-2, .display-3, .display-4, .display-5 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+
+/* ============= NAVBAR ============= */
+.navbar-spait {
+  background-color: var(--spait-fosc);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+.navbar-spait .navbar-brand {
+  color: var(--spait-blanc) !important;
+  font-size: 1.3rem;
+}
+.navbar-spait .nav-link {
+  color: rgba(255,255,255,0.85) !important;
+}
+.navbar-spait .nav-link:hover {
+  color: var(--spait-groc) !important;
+}
+
+/* ============= LOGIN PAGE ============= */
+.login-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--spait-fosc) 0%, #1a252f 40%, #2c3e50 70%, #8B0000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.login-card {
+  max-width: 500px;
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+.login-logo {
+  max-height: 80px;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+}
+.login-header {
+  background: linear-gradient(135deg, var(--spait-vermell), #8B0000);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+.login-header h1 {
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+.login-header .slogan {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+/* ============= BUTTONS ============= */
+.btn-spait {
+  background-color: var(--spait-vermell);
+  color: white;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.btn-spait:hover {
+  background-color: var(--spait-vermell-clar);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(192,57,43,0.4);
+}
+.btn-spait-verd {
+  background-color: var(--spait-verd);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+.btn-spait-verd:hover {
+  background-color: var(--spait-verd-clar);
+  color: white;
+}
+.btn-spait-groc {
+  background-color: var(--spait-groc);
+  color: var(--spait-fosc);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+.btn-spait-groc:hover {
+  background-color: #f39c12;
+  color: var(--spait-fosc);
+}
+
+/* ============= MAP ============= */
+#map {
+  height: 45vh;
+  min-height: 280px;
+  border-radius: 0;
+  z-index: 1;
+}
+@media (max-width: 768px) {
+  #map {
+    height: 40vh;
+  }
+}
+
+/* ============= CARTILLA ============= */
+.cartilla-wrapper {
+  overflow-y: auto;
+  max-height: 55vh;
+  padding: 1rem;
+}
+@media (max-width: 768px) {
+  .cartilla-wrapper {
+    max-height: none;
+  }
+}
+
+.cartilla-header {
+  background: linear-gradient(135deg, var(--spait-fosc), #1a252f);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px 12px 0 0;
+}
+
+.segells-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 1rem;
+}
+@media (min-width: 576px) {
+  .segells-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 992px) {
+  .segells-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.segell {
+  border-radius: 10px;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.segell.completat {
+  background: linear-gradient(135deg, #d4edda, #a8d5b5);
+  border-color: var(--spait-verd);
+  color: #155724;
+}
+.segell.propera {
+  background: linear-gradient(135deg, #cce5ff, #b8daff);
+  border-color: #007bff;
+  color: #004085;
+  animation: pulse-blue 2s infinite;
+}
+.segell.pendent {
+  background: #f8f9fa;
+  color: #adb5bd;
+}
+.segell.final {
+  grid-column: span 2;
+}
+.segell .segell-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+.segell .segell-hora {
+  font-size: 0.7rem;
+  font-weight: 400;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+@keyframes pulse-blue {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,123,255,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(0,123,255,0); }
+}
+
+/* ============= PROGRESS BAR ============= */
+.progress-spait .progress-bar {
+  background: linear-gradient(90deg, var(--spait-verd), var(--spait-verd-clar));
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+
+/* ============= CHECK-IN INFO BAR ============= */
+.checkin-bar {
+  background: var(--spait-fosc);
+  color: white;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+.checkin-bar .distancia-info {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+}
+.btn-checkin {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  transition: all 0.3s;
+}
+.btn-checkin:not(:disabled) {
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(39,174,96,0.5); }
+  50%       { box-shadow: 0 0 0 10px rgba(39,174,96,0); }
+}
+
+/* ============= MODALS ============= */
+.modal-header-spait {
+  background: linear-gradient(135deg, var(--spait-vermell), #8B0000);
+  color: white;
+}
+.modal-header-spait .btn-close {
+  filter: invert(1);
+}
+
+/* ============= ADMIN ============= */
+.admin-sidebar {
+  background-color: var(--spait-fosc);
+  min-height: 100vh;
+}
+.admin-sidebar .nav-link {
+  color: rgba(255,255,255,0.75);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+}
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+  background-color: rgba(255,255,255,0.1);
+  color: var(--spait-groc);
+}
+.admin-sidebar .nav-link i {
+  width: 20px;
+}
+
+.stat-card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: transform 0.2s;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+.stat-card .stat-icon {
+  font-size: 2.5rem;
+  opacity: 0.15;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.stat-card .stat-num {
+  font-family: 'Nunito', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.stat-card .stat-label {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* ============= ALERTS AMIGABLES ============= */
+.alert-spait {
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+}
+
+/* ============= TABLETS PARTICIPANTS ============= */
+.table-participants th {
+  background-color: var(--spait-fosc);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+}
+.badge-ruta-llarga {
+  background-color: var(--spait-verd);
+}
+.badge-ruta-curta {
+  background-color: #0d6efd;
+}
+
+/* ============= PARPELLEIG POSICIO USUARI ============= */
+.user-location-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3498db;
+  border: 3px solid white;
+  box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+  animation: parpelleig 1.5s infinite;
+}
+@keyframes parpelleig {
+  0%   { box-shadow: 0 0 0 0 rgba(52,152,219,0.7); }
+  70%  { box-shadow: 0 0 0 12px rgba(52,152,219,0); }
+  100% { box-shadow: 0 0 0 0 rgba(52,152,219,0); }
+}
+
+/* ============= MISSATGE FINAL ============= */
+.missatge-final {
+  background: linear-gradient(135deg, var(--spait-groc), #f39c12);
+  color: var(--spait-fosc);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  font-family: 'Nunito', sans-serif;
+}
+.missatge-final h2 {
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+/* ============= SCROLL SUAU ============= */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============= FOOTER ============= */
+.footer-spait {
+  background-color: var(--spait-fosc);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  padding: 1rem;
+  text-align: center;
+}
+.footer-spait a {
+  color: var(--spait-groc);
+  text-decoration: none;
+}
+
+/* ============= LEAFLET CUSTOM ICONS ============= */
+.marker-completat { filter: hue-rotate(90deg); }
+.marker-propera   { filter: hue-rotate(200deg); }
+
+/* ============= TAB PILLS LOGIN ============= */
+.nav-pills-spait .nav-link {
+  color: var(--spait-fosc);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  border-radius: 8px;
+}
+.nav-pills-spait .nav-link.active {
+  background-color: var(--spait-vermell);
+  color: white;
+}
+
+/* ============= MOTIVACIÓ CARD ============= */
+.motivacio-card {
+  background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+  border-radius: 12px;
+  border: none;
+  font-style: italic;
+  font-size: 1.1rem;
+}
