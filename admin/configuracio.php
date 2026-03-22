@@ -250,6 +250,31 @@ $logo     = $vis['logo_local'] ?: ($vis['logo_url'] ?? '');
             </div>
           </div>
 
+          <!-- Toggle registre obert/tancat -->
+          <div class="card mb-4 border-warning">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">📝 Registre de participants</h6>
+                  <small class="text-muted">
+                    Si està desactivat, els participants no es poden registrar sols.<br>
+                    Només l'admin pot donar-los d'alta mitjançant Excel o manualment.
+                  </small>
+                </div>
+                <div class="form-check form-switch ms-3">
+                  <input class="form-check-input" type="checkbox"
+                         id="toggle-registre"
+                         <?= ($ev['registre_obert'] ?? true) ? 'checked' : '' ?>
+                         style="width: 3em; height: 1.5em;">
+                  <label class="form-check-label fw-bold <?= ($ev['registre_obert'] ?? true) ? 'text-success' : 'text-danger' ?>"
+                         id="toggle-registre-label" for="toggle-registre">
+                    <?= ($ev['registre_obert'] ?? true) ? 'OBERT' : 'TANCAT' ?>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <hr>
 
           <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt me-2"></i>GPS i check-in</h6>
@@ -336,6 +361,7 @@ function desarEvent() {
     missatge_final:      document.getElementById('ev_final').value,
     avis_global:         document.getElementById('ev_avis')?.value ?? '',
     mode_prova:          document.getElementById('ev_mode_prova')?.checked ?? false,
+    registre_obert:      document.getElementById('toggle-registre')?.checked ?? true,
     dates_actives: {
       inici: document.getElementById('ev_inici').value,
       fi:    document.getElementById('ev_fi').value,
@@ -355,7 +381,7 @@ function desarVisual() {
 }
 
 function desarControl() {
-  // Desar event (avis + mode prova) + checkin
+  // Desar event (avis + mode prova + registre_obert) + checkin
   saveSection('event', {
     nom:                 document.getElementById('ev_nom')?.value ?? '',
     organitzacio:        document.getElementById('ev_organitzacio')?.value ?? '',
@@ -366,6 +392,7 @@ function desarControl() {
     missatge_final:      document.getElementById('ev_final')?.value ?? '',
     avis_global:         document.getElementById('ev_avis').value,
     mode_prova:          document.getElementById('ev_mode_prova').checked,
+    registre_obert:      document.getElementById('toggle-registre').checked,
   });
   saveSection('checkin', {
     require_gps:  document.getElementById('chk_require_gps').checked,
@@ -436,6 +463,40 @@ function toggleCodiMestre() {
     icon.className = 'bi bi-eye';
   }
 }
+
+// Toggle registre obert/tancat
+document.getElementById('toggle-registre').addEventListener('change', function() {
+  const obert = this.checked;
+  const label = document.getElementById('toggle-registre-label');
+  label.textContent = obert ? 'OBERT' : 'TANCAT';
+  label.className = 'form-check-label fw-bold ' + (obert ? 'text-success' : 'text-danger');
+
+  fetch('api/save_settings.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      section: 'event',
+      data: {
+        nom:                 document.getElementById('ev_nom')?.value ?? '',
+        organitzacio:        document.getElementById('ev_organitzacio')?.value ?? '',
+        data_esdeveniment:   document.getElementById('ev_data')?.value ?? '',
+        web:                 document.getElementById('ev_web')?.value ?? '',
+        contacte:            document.getElementById('ev_contacte')?.value ?? '',
+        missatge_benvinguda: document.getElementById('ev_benvinguda')?.value ?? '',
+        missatge_final:      document.getElementById('ev_final')?.value ?? '',
+        avis_global:         document.getElementById('ev_avis')?.value ?? '',
+        mode_prova:          document.getElementById('ev_mode_prova')?.checked ?? false,
+        registre_obert:      obert,
+      }
+    })
+  }).then(() => {
+    showToast(obert
+      ? '✅ Registre obert — els participants es poden registrar'
+      : '🔒 Registre tancat — només l\'admin pot donar d\'alta',
+      obert ? 'success' : 'warning'
+    );
+  });
+});
 
 // Pujar logo
 async function pujarLogo() {

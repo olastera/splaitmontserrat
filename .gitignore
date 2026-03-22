@@ -16,3 +16,7 @@ assets/img/logo_*
 # Editor
 .vscode/
 .idea/
+
+# Composer
+vendor/
+composer.lock
