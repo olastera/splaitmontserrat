@@ -29,3 +29,4 @@ ehthumbs.db
 # VSCode Windows
 .vscode/
 *.code-workspace
+CLAUDE_CODE_PROMPT*.md
