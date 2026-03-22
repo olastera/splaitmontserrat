@@ -14,8 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-
-
 $accio     = $_POST['accio'] ?? '';
 $parada_id = intval($_POST['parada_id'] ?? -1);
 $user      = current_user();
@@ -25,9 +23,12 @@ if (!$user) {
     exit;
 }
 
-// Buscar la parada
+// Buscar la parada des de settings dinàmics
+$settings = get_settings();
+$parades  = $settings['parades'] ?? [];
+
 $parada = null;
-foreach ($PARADES as $p) {
+foreach ($parades as $p) {
     if ($p['id'] === $parada_id) {
         $parada = $p;
         break;
@@ -41,7 +42,12 @@ if (!$parada) {
 
 // Validar que la parada pertany a la ruta de l'usuari
 $ruta = $user['ruta'] ?? 'curta';
-if ($parada['ruta'] !== 'ambdues' && $parada['ruta'] !== $ruta) {
+$parada_rutes = $parada['rutes'] ?? [];
+// Compatibilitat format antic
+if (empty($parada_rutes) && isset($parada['ruta'])) {
+    $parada_rutes = $parada['ruta'] === 'ambdues' ? ['llarga', 'curta'] : [$parada['ruta']];
+}
+if (!in_array($ruta, $parada_rutes)) {
     echo json_encode(['ok' => false, 'error' => 'Aquesta parada no és de la teva ruta.']);
     exit;
 }
@@ -58,7 +64,16 @@ if ($accio === 'validar_codi') {
         echo json_encode(['ok' => true]);
         exit;
     }
-    $codi = strtoupper(trim($_POST['codi'] ?? ''));
+
+    $codi        = strtoupper(trim($_POST['codi'] ?? ''));
+    $codi_mestre = strtoupper(trim($settings['checkin']['codi_mestre'] ?? ''));
+
+    // Acceptar codi mestre si està configurat
+    if ($codi_mestre && $codi === $codi_mestre) {
+        echo json_encode(['ok' => true]);
+        exit;
+    }
+
     if ($codi === strtoupper($parada['codi'])) {
         echo json_encode(['ok' => true]);
     } else {

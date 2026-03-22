@@ -107,14 +107,109 @@ $PARADES = [
   ],
 ];
 
-// Llegir configuració global
-function get_settings() {
-    $f = DATA_PATH . '../settings.json';
-    if (!file_exists($f)) return [];
-    return json_decode(file_get_contents($f), true) ?? [];
+// Llegir configuració global (amb cache estàtica)
+function get_settings(): array {
+    static $settings = null;
+    if ($settings !== null) return $settings;
+
+    $file = __DIR__ . '/../data/settings.json';
+    if (file_exists($file)) {
+        $loaded = json_decode(file_get_contents($file), true);
+        if ($loaded) {
+            $settings = $loaded;
+            return $settings;
+        }
+    }
+
+    $settings = get_default_settings();
+    return $settings;
 }
 
-function is_gps_override() {
+function get_default_settings(): array {
+    global $PARADES, $TESTS;
+
+    // Convertir format antic de parades al format nou
+    $parades_new = [];
+    foreach ($PARADES as $p) {
+        $ruta = $p['ruta'] ?? 'ambdues';
+        $rutes = ($ruta === 'ambdues') ? ['llarga', 'curta'] : [$ruta];
+        $id = $p['id'];
+        $preguntes = [];
+        if (isset($TESTS[$id])) {
+            $idx = 1;
+            foreach ($TESTS[$id] as $key => $q) {
+                $preguntes[] = [
+                    'id'     => 'p' . $id . '_' . $idx,
+                    'text'   => $q['pregunta'],
+                    'tipus'  => $q['tipus'],
+                    'opcions' => $q['opcions'] ?? [],
+                ];
+                $idx++;
+            }
+        }
+        $np = [
+            'id'                => $id,
+            'nom'               => $p['nom'],
+            'rutes'             => $rutes,
+            'lat'               => $p['lat'],
+            'lng'               => $p['lng'],
+            'codi'              => $p['codi'],
+            'radi_metres'       => null,
+            'es_inici'          => !empty($p['inici']),
+            'es_final'          => !empty($p['final']),
+            'missatge_arribada' => '',
+            'preguntes'         => $preguntes,
+        ];
+        if (!empty($p['inici_curt'])) {
+            $np['es_inici_ruta'] = 'curta';
+        }
+        $parades_new[] = $np;
+    }
+
+    return [
+        'gps_override' => false,
+        'event' => [
+            'nom'                 => 'Caminada a Montserrat 2026',
+            'organitzacio'        => 'splaiT',
+            'data_esdeveniment'   => '2026-04-19',
+            'web'                 => 'https://esplaispait.com',
+            'contacte'            => '722 313 772',
+            'missatge_benvinguda' => 'Benvingut/da a la caminada!',
+            'missatge_final'      => 'HO HAS ACONSEGUIT!',
+            'avis_global'         => '',
+            'mode_prova'          => false,
+        ],
+        'visual' => [
+            'logo_url'        => 'https://esplaispait.com/wp-content/uploads/2024/11/cropped-cropped-cropped-logo_splait-removebg-preview-1.png',
+            'logo_local'      => '',
+            'color_primari'   => '#C0392B',
+            'color_secundari' => '#27AE60',
+            'color_accent'    => '#F1C40F',
+            'nom_app'         => 'Cartilla del Pelegrí',
+        ],
+        'checkin' => [
+            'require_gps'  => false,
+            'radi_metres'  => 200,
+            'codi_mestre'  => '',
+        ],
+        'rutes' => [
+            ['id' => 'llarga', 'nom' => 'Ruta Llarga (Barcelona)', 'descripcio' => ''],
+            ['id' => 'curta',  'nom' => 'Ruta Curta (Terrassa)',   'descripcio' => ''],
+        ],
+        'parades' => $parades_new,
+    ];
+}
+
+function save_settings(array $settings): bool {
+    $file = __DIR__ . '/../data/settings.json';
+    return file_put_contents(
+        $file,
+        json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+        LOCK_EX
+    ) !== false;
+}
+
+function is_gps_override(): bool {
     $s = get_settings();
     return !empty($s['gps_override']);
 }

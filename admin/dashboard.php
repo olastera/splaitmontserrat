@@ -4,19 +4,27 @@ require_once __DIR__ . '/../includes/auth.php';
 
 require_admin('index.php');
 
-
 $gps_override = is_gps_override();
-$users = get_all_users();
-$total = count($users);
+$settings     = get_settings();
+$parades      = $settings['parades'] ?? $PARADES;
+$users        = get_all_users();
+$total        = count($users);
 
-$llarga = count(array_filter($users, fn($u) => ($u['ruta'] ?? '') === 'llarga'));
-$curta  = count(array_filter($users, fn($u) => ($u['ruta'] ?? '') === 'curta'));
+$llarga  = count(array_filter($users, fn($u) => ($u['ruta'] ?? '') === 'llarga'));
+$curta   = count(array_filter($users, fn($u) => ($u['ruta'] ?? '') === 'curta'));
+
+// Detectar id parada final
+$id_final = null;
+foreach ($parades as $p) {
+    if (!empty($p['es_final']) || !empty($p['final'])) { $id_final = $p['id']; break; }
+}
+if ($id_final === null) $id_final = 10;
 
 $acabats = 0;
 $en_ruta = 0;
 foreach ($users as $u) {
     $cids = array_column($u['checkins'] ?? [], 'parada_id');
-    if (in_array(10, $cids)) {
+    if (in_array($id_final, $cids)) {
         $acabats++;
     } elseif (!empty($cids)) {
         $en_ruta++;
@@ -25,7 +33,7 @@ foreach ($users as $u) {
 
 // Estadístiques per parada
 $parada_stats = [];
-foreach ($PARADES as $p) {
+foreach ($parades as $p) {
     $count = 0;
     foreach ($users as $u) {
         $cids = array_column($u['checkins'] ?? [], 'parada_id');
@@ -33,13 +41,15 @@ foreach ($PARADES as $p) {
     }
     $parada_stats[$p['id']] = $count;
 }
+
+$logo = $settings['visual']['logo_local'] ?: $settings['visual']['logo_url'];
 ?>
 <!DOCTYPE html>
 <html lang="ca">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Admin — Montserrat 2026</title>
+  <title>Dashboard Admin — <?= htmlspecialchars($settings['event']['nom'] ?? 'Montserrat 2026') ?></title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="../assets/css/spait.css">
@@ -47,25 +57,38 @@ foreach ($PARADES as $p) {
 <body>
 
 <!-- NAVBAR ADMIN -->
-<nav class="navbar navbar-spait px-3 py-2">
+<nav class="navbar navbar-spait navbar-expand-lg px-3 py-2">
   <a class="navbar-brand d-flex align-items-center gap-2" href="dashboard.php">
-    <img src="https://esplaispait.com/wp-content/uploads/2024/11/cropped-cropped-cropped-logo_splait-removebg-preview-1.png"
-         height="32" alt="splaiT">
-    <span>Panel Admin 2026</span>
+    <img src="<?= htmlspecialchars($logo) ?>" height="32" alt="splaiT">
+    <span>Admin</span>
   </a>
-  <div class="ms-auto d-flex gap-2">
-    <a href="mapa.php" class="btn btn-sm btn-outline-light">
-      <i class="bi bi-geo-alt me-1"></i>Mapa
-    </a>
-    <a href="participants.php" class="btn btn-sm btn-outline-light">
-      <i class="bi bi-people me-1"></i>Participants
-    </a>
-    <a href="export_csv.php" class="btn btn-sm btn-outline-warning">
-      <i class="bi bi-download me-1"></i>CSV
-    </a>
-    <a href="logout.php" class="btn btn-sm btn-outline-danger">
-      <i class="bi bi-box-arrow-right me-1"></i>Sortir
-    </a>
+  <button class="navbar-toggler border-light" type="button" data-bs-toggle="collapse" data-bs-target="#navAdmin">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navAdmin">
+    <div class="navbar-nav ms-auto d-flex flex-row flex-wrap gap-1 align-items-center">
+      <a href="dashboard.php" class="btn btn-sm btn-outline-light">
+        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+      </a>
+      <a href="mapa.php" class="btn btn-sm btn-outline-light">
+        <i class="bi bi-geo-alt me-1"></i>Mapa
+      </a>
+      <a href="usuaris.php" class="btn btn-sm btn-outline-light">
+        <i class="bi bi-people me-1"></i>Usuaris
+      </a>
+      <a href="parades.php" class="btn btn-sm btn-outline-light">
+        <i class="bi bi-pin-map me-1"></i>Parades
+      </a>
+      <a href="configuracio.php" class="btn btn-sm btn-outline-light">
+        <i class="bi bi-gear me-1"></i>Configuració
+      </a>
+      <a href="export_csv.php" class="btn btn-sm btn-outline-warning">
+        <i class="bi bi-download me-1"></i>CSV
+      </a>
+      <a href="logout.php" class="btn btn-sm btn-outline-danger">
+        <i class="bi bi-box-arrow-right me-1"></i>Sortir
+      </a>
+    </div>
   </div>
 </nav>
 
@@ -142,27 +165,37 @@ foreach ($PARADES as $p) {
             <tr>
               <th>#</th>
               <th>Parada</th>
-              <th>Ruta</th>
+              <th>Rutes</th>
               <th>Participants</th>
               <th>% del total</th>
             </tr>
           </thead>
           <tbody>
-            <?php foreach ($PARADES as $p):
+            <?php foreach ($parades as $p):
               $count = $parada_stats[$p['id']] ?? 0;
               $pct   = $total > 0 ? round($count / $total * 100) : 0;
+              // Determinar rutes (format nou o antic)
+              $rutes_p = $p['rutes'] ?? [];
+              if (empty($rutes_p) && isset($p['ruta'])) {
+                  $rutes_p = $p['ruta'] === 'ambdues' ? ['llarga', 'curta'] : [$p['ruta']];
+              }
             ?>
             <tr>
               <td><?= $p['id'] ?></td>
-              <td><?= htmlspecialchars($p['nom']) ?></td>
               <td>
-                <?php if ($p['ruta'] === 'llarga'): ?>
-                  <span class="badge badge-ruta-llarga text-white">Llarga</span>
-                <?php elseif ($p['ruta'] === 'curta'): ?>
-                  <span class="badge badge-ruta-curta text-white">Curta</span>
-                <?php else: ?>
-                  <span class="badge bg-secondary">Ambdues</span>
+                <?= htmlspecialchars($p['nom']) ?>
+                <?php if (!empty($p['es_final']) || !empty($p['final'])): ?>
+                  <span class="badge bg-warning text-dark ms-1">Meta</span>
                 <?php endif; ?>
+              </td>
+              <td>
+                <?php foreach ($rutes_p as $r): ?>
+                  <?php if ($r === 'llarga'): ?>
+                    <span class="badge badge-ruta-llarga text-white">Llarga</span>
+                  <?php else: ?>
+                    <span class="badge badge-ruta-curta text-white">Curta</span>
+                  <?php endif; ?>
+                <?php endforeach; ?>
               </td>
               <td><strong><?= $count ?></strong></td>
               <td>
@@ -198,7 +231,7 @@ foreach ($PARADES as $p) {
         <?php else: ?>
           <p class="mb-0 text-muted">
             <i class="bi bi-lock-fill me-1"></i>
-            Normal — cal estar a menys de 200 m de la parada per activar el botó de check-in.
+            Normal — cal estar a menys de <?= (int)($settings['checkin']['radi_metres'] ?? 200) ?> m de la parada.
           </p>
         <?php endif; ?>
       </div>
@@ -213,8 +246,14 @@ foreach ($PARADES as $p) {
 
   <!-- Accés ràpid -->
   <div class="d-flex flex-wrap gap-3">
-    <a href="participants.php" class="btn btn-spait btn-lg">
+    <a href="usuaris.php" class="btn btn-spait btn-lg">
       <i class="bi bi-people me-2"></i>Veure tots els participants
+    </a>
+    <a href="parades.php" class="btn btn-spait btn-lg">
+      <i class="bi bi-pin-map me-2"></i>Gestionar parades
+    </a>
+    <a href="configuracio.php" class="btn btn-outline-secondary btn-lg">
+      <i class="bi bi-gear me-2"></i>Configuració
     </a>
     <a href="export_csv.php" class="btn btn-spait-groc btn-lg">
       <i class="bi bi-file-earmark-spreadsheet me-2"></i>Exportar CSV

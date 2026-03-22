@@ -58,7 +58,7 @@ foreach ($PARADES as $p) { $parades_map[$p['id']] = $p; }
 
 $ruta = $user['ruta'] ?? 'curta';
 $prog = get_user_progress($user, $PARADES);
-$pw_plain = decrypt_password($user['password_enc']);
+$pw_plain = null; // no es mostra la contrasenya actual
 ?>
 <!DOCTYPE html>
 <html lang="ca">
@@ -162,15 +162,6 @@ $pw_plain = decrypt_password($user['password_enc']);
           <h6 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Zona de seguretat</h6>
         </div>
         <div class="card-body" style="background:#fffbea">
-          <p class="mb-1 small fw-semibold">Contrasenya actual:</p>
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <code id="pw-text" class="fs-5 bg-light p-2 rounded flex-grow-1"><?= htmlspecialchars($pw_plain) ?></code>
-            <button class="btn btn-sm btn-outline-secondary"
-                    onclick="navigator.clipboard.writeText(document.getElementById('pw-text').textContent)"
-                    title="Copiar">
-              <i class="bi bi-clipboard"></i>
-            </button>
-          </div>
           <?php if ($nova_pw): ?>
           <div class="alert alert-success p-2 small">
             <i class="bi bi-key me-1"></i>Nova contrasenya generada:

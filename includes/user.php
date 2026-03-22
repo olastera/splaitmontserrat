@@ -154,10 +154,12 @@ function update_user_position(string $id, float $lat, float $lng, float $accurac
 }
 
 function get_last_checkin_name(array $user): string {
-    global $PARADES;
     if (empty($user['checkins'])) return 'Cap parada encara';
     $last = end($user['checkins']);
-    foreach ($PARADES as $p) {
+    $settings = get_settings();
+    $parades = $settings['parades'] ?? [];
+    if (empty($parades)) { global $PARADES; $parades = $PARADES; }
+    foreach ($parades as $p) {
         if ($p['id'] === $last['parada_id']) return $p['nom'];
     }
     return 'Parada ' . $last['parada_id'];
@@ -210,24 +212,44 @@ function get_active_positions(): array {
 
 function get_user_progress(array $user, array $parades): array {
     $ruta = $user['ruta'] ?? 'curta';
+
+    // Suportar format nou (rutes[]) i format antic (ruta string)
     $parades_ruta = array_filter($parades, function($p) use ($ruta) {
-        return $p['ruta'] === 'ambdues' || $p['ruta'] === $ruta;
+        if (isset($p['rutes'])) {
+            return in_array($ruta, $p['rutes']);
+        }
+        return ($p['ruta'] ?? '') === 'ambdues' || ($p['ruta'] ?? '') === $ruta;
     });
     $parades_ruta = array_values($parades_ruta);
 
     $checkin_ids = array_column($user['checkins'] ?? [], 'parada_id');
-    $total = count($parades_ruta);
-    // No comptar el punt d'inici (id=0) en el progrés si ruta llarga
-    $parades_comptables = array_filter($parades_ruta, fn($p) => empty($p['inici']));
+
+    // No comptar punts d'inici en el progrés
+    $parades_comptables = array_filter($parades_ruta, function($p) {
+        return empty($p['inici']) && empty($p['es_inici']);
+    });
     $total_comptables = count($parades_comptables);
     $completades = 0;
     foreach ($parades_comptables as $p) {
         if (in_array($p['id'], $checkin_ids)) $completades++;
     }
+
+    // Detectar parada final (es_final o final)
+    $id_final = null;
+    foreach ($parades as $p) {
+        if (!empty($p['es_final']) || !empty($p['final'])) {
+            $id_final = $p['id'];
+            break;
+        }
+    }
+    $acabat = $id_final !== null
+        ? in_array($id_final, $checkin_ids)
+        : in_array(10, $checkin_ids);
+
     return [
         'total'       => $total_comptables,
         'completades' => $completades,
         'percent'     => $total_comptables > 0 ? round($completades / $total_comptables * 100) : 0,
-        'acabat'      => in_array(10, $checkin_ids),
+        'acabat'      => $acabat,
     ];
 }

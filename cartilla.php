@@ -11,43 +11,53 @@ if (!$user) {
     exit;
 }
 
-
+// Llegir settings dinàmics
+$settings = get_settings();
+$parades  = $settings['parades'] ?? [];
+$gps_radi = $settings['checkin']['radi_metres'] ?? 200;
+$avis     = $settings['event']['avis_global'] ?? '';
 
 // Filtrar parades per ruta de l'usuari
 $ruta = $user['ruta'] ?? 'curta';
-$parades_ruta = array_values(array_filter($PARADES, function($p) use ($ruta) {
-    return $p['ruta'] === 'ambdues' || $p['ruta'] === $ruta;
+$parades_ruta = array_values(array_filter($parades, function($p) use ($ruta) {
+    $pr = $p['rutes'] ?? [];
+    if (empty($pr) && isset($p['ruta'])) {
+        $pr = $p['ruta'] === 'ambdues' ? ['llarga', 'curta'] : [$p['ruta']];
+    }
+    return in_array($ruta, $pr);
 }));
 
 $checkin_ids = array_column($user['checkins'] ?? [], 'parada_id');
 
 // Calcular progrés
-$progress = get_user_progress($user, $PARADES);
+$progress = get_user_progress($user, $parades);
 
-// Propera parada (la primera no completada que no sigui l'inici)
+// Detectar parada final
+$id_final = null;
+foreach ($parades as $p) {
+    if (!empty($p['es_final']) || !empty($p['final'])) { $id_final = $p['id']; break; }
+}
+$acabat = $id_final !== null ? in_array($id_final, $checkin_ids) : in_array(10, $checkin_ids);
+
+// Propera parada (primera no completada, excloent el punt d'inici)
 $propera_parada = null;
 foreach ($parades_ruta as $p) {
-    if (!empty($p['inici']) && $ruta === 'llarga') continue;
-    if (!empty($p['inici_curt']) && $ruta === 'curta') {
-        // Per a ruta curta, Les Fonts és la primera parada
-    }
+    if (!empty($p['es_inici']) || !empty($p['inici'])) continue;
     if (!in_array($p['id'], $checkin_ids)) {
         $propera_parada = $p;
         break;
     }
 }
 
-$acabat = in_array(10, $checkin_ids);
+$gps_override = is_gps_override();
 
 // JSON per JavaScript
-$parades_json   = json_encode($parades_ruta);
-$checkins_json  = json_encode($checkin_ids);
-$propera_json   = json_encode($propera_parada);
-$tests_json     = json_encode($TESTS);
-$checkins_data  = json_encode($user['checkins'] ?? []);
+$parades_json  = json_encode($parades_ruta);
+$checkins_json = json_encode($checkin_ids);
+$propera_json  = json_encode($propera_parada);
+$checkins_data = json_encode($user['checkins'] ?? []);
 
 $nom_curt = explode(' ', $user['nom'])[0];
-$gps_override = is_gps_override();
 ?>
 <!DOCTYPE html>
 <html lang="ca">
@@ -71,9 +81,11 @@ $gps_override = is_gps_override();
 <!-- NAVBAR -->
 <nav class="navbar navbar-spait navbar-expand-lg px-3 py-2">
   <a class="navbar-brand d-flex align-items-center gap-2" href="cartilla.php">
-    <img src="https://esplaispait.com/wp-content/uploads/2024/11/cropped-cropped-cropped-logo_splait-removebg-preview-1.png"
-         height="36" alt="splaiT">
-    <span>Caminada 2026</span>
+    <?php
+      $logo = $settings['visual']['logo_local'] ?: $settings['visual']['logo_url'];
+    ?>
+    <img src="<?= htmlspecialchars($logo) ?>" height="36" alt="splaiT">
+    <span><?= htmlspecialchars($settings['event']['nom'] ?? 'Caminada 2026') ?></span>
   </a>
   <div class="ms-auto d-flex align-items-center gap-2">
     <span class="text-white small d-none d-sm-inline">
@@ -89,6 +101,13 @@ $gps_override = is_gps_override();
     </a>
   </div>
 </nav>
+
+<?php if (!empty($avis)): ?>
+<div class="alert alert-warning alert-dismissible fade show mb-0 rounded-0 text-center py-2" role="alert">
+  <i class="bi bi-megaphone-fill me-2"></i><?= htmlspecialchars($avis) ?>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tanca"></button>
+</div>
+<?php endif; ?>
 
 <div class="app-container">
 
@@ -123,7 +142,7 @@ $gps_override = is_gps_override();
 
       <div class="distancia-info">
         <?php if ($acabat): ?>
-          <span class="text-warning"><i class="bi bi-trophy-fill me-1"></i>Has arribat a Montserrat! Enhorabona!</span>
+          <span class="text-warning"><i class="bi bi-trophy-fill me-1"></i><?= htmlspecialchars($settings['event']['missatge_final'] ?? 'HO HAS ACONSEGUIT!') ?></span>
         <?php elseif ($propera_parada): ?>
           <span><i class="bi bi-geo-alt me-1"></i>
             Proper punt: <strong><?= htmlspecialchars($propera_parada['nom']) ?></strong>
@@ -133,7 +152,7 @@ $gps_override = is_gps_override();
             &bull; <i class="bi bi-clock me-1"></i><span id="temps-val">—</span>
           </span>
         <?php else: ?>
-          <span class="text-warning"><i class="bi bi-mountains me-1"></i>Benvingut/da, endavant!</span>
+          <span class="text-warning"><i class="bi bi-mountains me-1"></i><?= htmlspecialchars($settings['event']['missatge_benvinguda'] ?? 'Benvingut/da!') ?></span>
         <?php endif; ?>
       </div>
       <div class="d-flex align-items-center gap-2">
@@ -157,7 +176,7 @@ $gps_override = is_gps_override();
     <?php if ($acabat): ?>
     <div class="missatge-final m-3">
       <div style="font-size:3rem;">🏔️🎉</div>
-      <h2>HO HAS ACONSEGUIT!</h2>
+      <h2><?= htmlspecialchars($settings['event']['missatge_final'] ?? 'HO HAS ACONSEGUIT!') ?></h2>
       <p class="mb-1 fs-5">Som d'esplai, res no ens atura!</p>
       <p class="mb-3">Benvingut/da a Montserrat, <strong><?= htmlspecialchars($nom_curt) ?></strong>!</p>
       <a href="download_pdf.php" class="btn btn-spait btn-lg">
@@ -212,9 +231,9 @@ $gps_override = is_gps_override();
     <!-- Segells -->
     <div class="segells-grid">
       <?php foreach ($parades_ruta as $p):
-        $completat = in_array($p['id'], $checkin_ids);
+        $completat  = in_array($p['id'], $checkin_ids);
         $es_propera = ($propera_parada && $p['id'] === $propera_parada['id']);
-        $es_final   = !empty($p['final']);
+        $es_final   = !empty($p['es_final']) || !empty($p['final']);
 
         // Hora check-in
         $hora_checkin = '';
@@ -260,7 +279,9 @@ $gps_override = is_gps_override();
     <?php endif; ?>
 
     <div class="footer-spait">
-      <a href="https://esplaispait.com" target="_blank">esplaispait.com</a> &bull;
+      <a href="<?= htmlspecialchars($settings['event']['web'] ?? 'https://esplaispait.com') ?>" target="_blank">
+        <?= htmlspecialchars($settings['event']['web'] ?? 'esplaispait.com') ?>
+      </a> &bull;
       Som d'esplai, res no ens atura!
     </div>
   </div>
@@ -324,10 +345,10 @@ $gps_override = is_gps_override();
 const PARADES      = <?= $parades_json ?>;
 const CHECKIN_IDS  = <?= $checkins_json ?>;
 const PROPERA      = <?= $propera_json ?>;
-const TESTS        = <?= $tests_json ?>;
 const RUTA_USUARI  = <?= json_encode($ruta) ?>;
 const ACABAT       = <?= json_encode($acabat) ?>;
 const GPS_OVERRIDE = <?= json_encode($gps_override) ?>;
+const GPS_RADI     = <?= (int)$gps_radi ?>;
 
 // ============= MAPA LEAFLET =============
 const map = L.map('map', { zoomControl: true });
@@ -366,10 +387,10 @@ const bounds = [];
 PARADES.forEach(p => {
   const completat = CHECKIN_IDS.includes(p.id);
   const esPropera = PROPERA && p.id === PROPERA.id;
-  const esFinal   = !!p.final;
+  const esFinal   = !!p.es_final || !!p.final;
 
   let icon = iconPendent;
-  if (completat)   icon = esFinal ? iconFinal : iconComplet;
+  if (completat)      icon = esFinal ? iconFinal : iconComplet;
   else if (esPropera) icon = iconPropera;
   else if (esFinal)   icon = iconFinal;
 
@@ -391,7 +412,6 @@ if (bounds.length > 0) {
 // ============= GPS =============
 let userLat = null, userLng = null;
 let userMarker = null;
-const GPS_THRESHOLD = 200; // metres
 
 function haversine(lat1, lng1, lat2, lng2) {
   const R = 6371000;
@@ -439,12 +459,12 @@ function updateGPS(pos) {
 
     const btnCheckin = document.getElementById('btn-checkin');
     if (btnCheckin && !GPS_OVERRIDE) {
-      if (dist <= GPS_THRESHOLD) {
+      if (dist <= GPS_RADI) {
         btnCheckin.disabled = false;
         btnCheckin.title = '';
       } else {
         btnCheckin.disabled = true;
-        btnCheckin.title = 'Cal estar a menys de 200 m de la parada';
+        btnCheckin.title = 'Cal estar a menys de ' + GPS_RADI + ' m de la parada';
       }
     }
   }
@@ -453,7 +473,6 @@ function updateGPS(pos) {
 function gpsError(err) {
   document.getElementById('gps-icon').className = 'bi bi-geo-alt-fill text-warning';
   document.getElementById('gps-status').title = 'GPS no disponible: ' + err.message;
-  // Activar igualment el botó amb avís
   const btnCheckin = document.getElementById('btn-checkin');
   if (btnCheckin) {
     btnCheckin.disabled = false;
@@ -466,8 +485,7 @@ let sharingLocation = <?= user_shares_location($user) ? 'true' : 'false' ?>;
 let pendingPosition = null;
 
 function sendPosition(lat, lng, accuracy) {
-  if (!sharingLocation) return; // estalviar bateria i dades si tracking OFF
-
+  if (!sharingLocation) return;
   fetch('update_position.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -477,7 +495,6 @@ function sendPosition(lat, lng, accuracy) {
   });
 }
 
-// Reintent si hi havia posició pendent i recuperem connexió
 function flushPending() {
   if (pendingPosition && sharingLocation) {
     const p = pendingPosition;
@@ -563,37 +580,36 @@ document.getElementById('btn-validar-codi').addEventListener('click', () => {
   });
 });
 
+// Mostrar preguntes del test (format nou: preguntes[] dins de cada parada)
 function mostrarTest(paradaId) {
-  const test = TESTS[paradaId];
+  const parada    = PARADES.find(p => p.id === paradaId);
+  const preguntes = parada?.preguntes ?? [];
   const container = document.getElementById('test-preguntes');
   container.innerHTML = '';
-
-  if (!test) {
-    // Sense test (parada 0 per exemple) → confirmar directament
-    document.getElementById('fase-codi').classList.add('d-none');
-    document.getElementById('fase-test').classList.remove('d-none');
-    container.innerHTML = '<p class="text-muted">Ja pots confirmar el check-in!</p>';
-    return;
-  }
 
   document.getElementById('fase-codi').classList.add('d-none');
   document.getElementById('fase-test').classList.remove('d-none');
 
-  Object.entries(test).forEach(([key, q], idx) => {
+  if (!preguntes.length) {
+    container.innerHTML = '<p class="text-muted">Ja pots confirmar el check-in!</p>';
+    return;
+  }
+
+  preguntes.forEach((q, idx) => {
     const div = document.createElement('div');
     div.classList.add('mb-3');
 
-    if (q.tipus === 'opcions') {
-      div.innerHTML = `<label class="form-label fw-semibold">${idx+1}. ${q.pregunta}</label>
+    if (q.tipus === 'opcions' && q.opcions && q.opcions.length) {
+      div.innerHTML = `<label class="form-label fw-semibold">${idx+1}. ${q.text}</label>
         <div class="d-flex flex-wrap gap-2">
           ${q.opcions.map(o => `
-            <input type="radio" class="btn-check" name="test_${key}" id="opt_${key}_${o.replace(/\s/g,'_')}" value="${o}" autocomplete="off">
-            <label class="btn btn-outline-secondary btn-sm" for="opt_${key}_${o.replace(/\s/g,'_')}">${o}</label>
+            <input type="radio" class="btn-check" name="test_${q.id}" id="opt_${q.id}_${o.replace(/\s/g,'_')}" value="${o}" autocomplete="off">
+            <label class="btn btn-outline-secondary btn-sm" for="opt_${q.id}_${o.replace(/\s/g,'_')}">${o}</label>
           `).join('')}
         </div>`;
     } else {
-      div.innerHTML = `<label class="form-label fw-semibold">${idx+1}. ${q.pregunta}</label>
-        <textarea class="form-control" name="test_${key}" rows="2" placeholder="Escriu aquí..."></textarea>`;
+      div.innerHTML = `<label class="form-label fw-semibold">${idx+1}. ${q.text}</label>
+        <textarea class="form-control" name="test_${q.id}" rows="2" placeholder="Escriu aquí..."></textarea>`;
     }
     container.appendChild(div);
   });
@@ -604,12 +620,10 @@ document.getElementById('btn-confirmar-checkin').addEventListener('click', () =>
   const paradaId = parseInt(btnCheckin?.dataset.paradaId ?? -1);
   const testData = {};
 
-  // Recollir respostes opcions
   document.querySelectorAll('#test-preguntes input[type=radio]:checked').forEach(el => {
     const name = el.name.replace('test_', '');
     testData[name] = el.value;
   });
-  // Recollir respostes text
   document.querySelectorAll('#test-preguntes textarea').forEach(el => {
     const name = el.name.replace('test_', '');
     testData[name] = el.value;
@@ -631,7 +645,6 @@ document.getElementById('btn-confirmar-checkin').addEventListener('click', () =>
     if (data.ok) {
       document.getElementById('fase-test').classList.add('d-none');
       document.getElementById('fase-ok').classList.remove('d-none');
-      // Recarregar pàgina al tancar el modal
       modalEl.addEventListener('hidden.bs.modal', () => location.reload(), { once: true });
     } else {
       alert('Error: ' + (data.error || 'No s\'ha pogut registrar el check-in.'));

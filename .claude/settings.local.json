@@ -18,7 +18,13 @@
       "Read(//usr/**)",
       "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/toggle_gps.php)",
       "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/dashboard.php)",
-      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/includes/config.php)"
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/includes/config.php)",
+      "Bash(mkdir -p /home/oscar/iespai/www/splaitmontserrat/admin/api)",
+      "Bash(mkdir -p /home/oscar/iespai/www/splaitmontserrat/assets/img)",
+      "Bash(ls /usr/bin/php*)",
+      "Bash(ls -la /home/oscar/iespai/www/splaitmontserrat/admin/*.php)",
+      "Bash(grep:*)",
+      "Bash(python3 -m json.tool /home/oscar/iespai/www/splaitmontserrat/data/settings.json)"
     ]
   }
 }
