@@ -16,3 +16,4 @@ assets/img/logo_*
 # Editor
 .vscode/
 .idea/
+*:Zone.Identifier
