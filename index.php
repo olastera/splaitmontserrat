@@ -7,14 +7,21 @@ if (is_logged_in()) {
     exit;
 }
 
+$settings       = get_settings();
+$registre_obert = $settings['event']['registre_obert'] ?? true;
+
 $error   = '';
 $success = '';
-$tab     = 'registre';
+$tab     = $registre_obert ? 'registre' : 'login';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accio = $_POST['accio'] ?? '';
 
     if ($accio === 'registre') {
+        if (!$registre_obert) {
+            $error = 'El registre està tancat.';
+            $tab   = 'login';
+        } else {
         $tab = 'registre';
         $nom      = trim($_POST['nom'] ?? '');
         $email    = strtolower(trim($_POST['email'] ?? ''));
@@ -50,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         }
+        } // end else (registre_obert)
     } elseif ($accio === 'login') {
         $tab = 'login';
         $identifier = strtolower(trim($_POST['identifier'] ?? ''));
@@ -96,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <!-- Pestanyes -->
       <ul class="nav nav-pills nav-pills-spait mb-4 justify-content-center" id="loginTabs" role="tablist">
+        <?php if ($registre_obert): ?>
         <li class="nav-item" role="presentation">
           <button class="nav-link <?= $tab === 'registre' ? 'active' : '' ?>"
                   id="tab-registre" data-bs-toggle="pill" data-bs-target="#pane-registre"
@@ -103,7 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="bi bi-person-plus me-1"></i>Registre
           </button>
         </li>
-        <li class="nav-item ms-2" role="presentation">
+        <?php endif; ?>
+        <li class="nav-item <?= $registre_obert ? 'ms-2' : '' ?>" role="presentation">
           <button class="nav-link <?= $tab === 'login' ? 'active' : '' ?>"
                   id="tab-login" data-bs-toggle="pill" data-bs-target="#pane-login"
                   type="button" role="tab">
@@ -115,6 +125,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="tab-content">
         <!-- REGISTRE -->
         <div class="tab-pane fade <?= $tab === 'registre' ? 'show active' : '' ?>" id="pane-registre" role="tabpanel">
+          <?php if (!$registre_obert): ?>
+          <div class="alert alert-warning text-center mt-3">
+            <h6><i class="bi bi-lock me-1"></i>El registre està tancat</h6>
+            <p class="mb-0 small">
+              Els organitzadors gestionen els participants directament.<br>
+              Si necessites accés, contacta amb els organitzadors.
+            </p>
+            <?php if (!empty($settings['event']['contacte'])): ?>
+              <a href="tel:<?= htmlspecialchars($settings['event']['contacte']) ?>"
+                 class="btn btn-sm btn-primary mt-2">
+                <i class="bi bi-telephone me-1"></i><?= htmlspecialchars($settings['event']['contacte']) ?>
+              </a>
+            <?php endif; ?>
+          </div>
+          <?php else: ?>
           <form method="POST" action="index.php" novalidate>
             <input type="hidden" name="accio" value="registre">
 
@@ -191,6 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <i class="bi bi-person-check me-2"></i>Registrar-me i començar!
             </button>
           </form>
+          <?php endif; ?>
         </div>
 
         <!-- LOGIN -->
@@ -216,6 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
           </form>
 
+          <?php if ($registre_obert): ?>
           <div class="text-center mt-3">
             <small class="text-muted">No tens compte?
               <a href="#" onclick="document.getElementById('tab-registre').click(); return false;">
@@ -223,6 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </a>
             </small>
           </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
