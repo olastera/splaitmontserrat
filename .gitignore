@@ -17,3 +17,15 @@ assets/img/logo_*
 .vscode/
 .idea/
 *:Zone.Identifier
+
+# Windows / WSL
+*:Zone.Identifier
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+ehthumbs.db
+
+# VSCode Windows
+.vscode/
+*.code-workspace
