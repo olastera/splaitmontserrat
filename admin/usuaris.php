@@ -43,7 +43,7 @@ foreach ($parades as $p) $parades_map[$p['id']] = $p;
       <a href="usuaris.php" class="btn btn-sm btn-light"><i class="bi bi-people me-1"></i>Usuaris</a>
       <a href="parades.php" class="btn btn-sm btn-outline-light"><i class="bi bi-pin-map me-1"></i>Parades</a>
       <a href="configuracio.php" class="btn btn-sm btn-outline-light"><i class="bi bi-gear me-1"></i>Configuració</a>
-      <a href="export_csv.php" class="btn btn-sm btn-outline-warning"><i class="bi bi-download me-1"></i>CSV</a>
+      <a href="export_csv.php" class="btn btn-sm btn-outline-warning"><i class="bi bi-download me-1"></i>Excel</a>
       <a href="logout.php" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right me-1"></i>Sortir</a>
     </div>
   </div>
@@ -125,14 +125,14 @@ foreach ($parades as $p) $parades_map[$p['id']] = $p;
   </div>
 
   <div class="d-flex gap-2 flex-wrap mb-3">
-    <a href="api/export_excel.php" class="btn btn-success">
-      <i class="bi bi-file-earmark-spreadsheet me-1"></i>Exportar CSV
+    <a href="export_csv.php" class="btn btn-success">
+      <i class="bi bi-file-earmark-spreadsheet me-1"></i>Exportar Excel
     </a>
     <a href="api/download_template.php" class="btn btn-outline-secondary">
-      <i class="bi bi-download me-1"></i>Baixar plantilla CSV
+      <i class="bi bi-download me-1"></i>Baixar plantilla Excel
     </a>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-import">
-      <i class="bi bi-upload me-1"></i>Importar CSV
+      <i class="bi bi-upload me-1"></i>Importar Excel
     </button>
   </div>
 
@@ -141,22 +141,23 @@ foreach ($parades as $p) $parades_map[$p['id']] = $p;
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">📥 Importar participants des de CSV</h5>
+          <h5 class="modal-title">📥 Importar participants des d'Excel</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <div class="alert alert-info small">
             <strong>ℹ️ Abans d'importar:</strong>
             <ul class="mb-0 mt-1">
-              <li>Baixa la <strong>plantilla CSV</strong> per veure el format correcte</li>
-              <li>Els camps obligatoris són: <code>nom</code> i <code>email</code> o <code>telefon</code></li>
-              <li>Si un participant ja existeix (mateix email/telèfon) <strong>no es modificarà</strong></li>
-              <li>Es generarà una contrasenya automàtica per a cada participant nou</li>
+              <li>Baixa la <strong>plantilla Excel</strong> per veure el format correcte</li>
+              <li><strong>Columna ID buida</strong> → alta de participant nou (cal nom + email o telèfon)</li>
+              <li><strong>Columna ID amb valor</strong> → actualitza les dades del participant existent</li>
+              <li>Contrasenya buida en actualització → es manté l'actual</li>
+              <li>Qualsevol error bloqueja tota la importació fins que es corregeixi</li>
             </ul>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-bold">Selecciona el fitxer CSV (.csv)</label>
-            <input type="file" class="form-control" id="import-file" accept=".csv">
+            <label class="form-label fw-bold">Selecciona el fitxer Excel o CSV (.xlsx, .csv)</label>
+            <input type="file" class="form-control" id="import-file" accept=".xlsx,.csv">
           </div>
           <div id="import-preview" style="display:none">
             <hr>
@@ -383,7 +384,7 @@ document.getElementById('btn-preview-import').addEventListener('click', function
     .then(data => {
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-eye me-1"></i>Previsualitzar';
-      if (!data.ok) { alert('Error: ' + (data.error || 'Error desconegut')); return; }
+      console.log('[import preview]', data);
       parsedImportData = data;
       showImportPreview(data);
     })
@@ -411,52 +412,82 @@ document.getElementById('btn-confirm-import').addEventListener('click', function
     .then(data => {
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Confirmar importació';
+      console.log('[import result]', data);
       if (data.ok) {
-        showToast(`✅ ${data.created} participants importats correctament`, 'success');
-        bootstrap.Modal.getInstance(document.getElementById('modal-import')).hide();
-        setTimeout(() => location.reload(), 1500);
+        const parts = [];
+        if (data.created > 0) parts.push(`${data.created} nous creats`);
+        if (data.updated > 0) parts.push(`${data.updated} actualitzats`);
+        if (data.failed > 0) parts.push(`⚠️ ${data.failed} han fallat`);
+        const type = data.failed > 0 ? 'warning' : 'success';
+        const icon = data.failed > 0 ? '⚠️' : '✅';
+        showToast(icon + ' ' + (parts.join(' · ') || 'Cap canvi realitzat'), type);
+        if (data.warning) console.warn('[import]', data.warning);
+        if (data.failed === 0) {
+          bootstrap.Modal.getInstance(document.getElementById('modal-import')).hide();
+          setTimeout(() => location.reload(), 1500);
+        }
       } else {
-        showToast('Error important: ' + (data.error || ''), 'danger');
+        showToast('Error en importar: ' + (data.error || ''), 'danger');
       }
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Confirmar importació';
+      showToast('Error de connexió en importar', 'danger');
     });
 });
 
 function showImportPreview(data) {
   document.getElementById('import-preview').style.display = 'block';
-  document.getElementById('import-stats').innerHTML = `
-    <div class="d-flex gap-2 flex-wrap">
-      <span class="badge bg-primary fs-6">${data.total} files llegides</span>
-      <span class="badge bg-success fs-6">${data.nous} nous participants</span>
-      <span class="badge bg-warning text-dark fs-6">${data.duplicats.length} duplicats</span>
-      <span class="badge bg-danger fs-6">${data.errors.length} errors</span>
-    </div>`;
+  document.getElementById('import-duplicates').innerHTML = '';
+  document.getElementById('import-errors').innerHTML = '';
 
-  if (data.duplicats.length > 0) {
-    document.getElementById('import-duplicates').innerHTML = `
-      <div class="alert alert-warning">
-        <strong>⚠️ Aquests participants ja existeixen i NO s'importaran:</strong>
-        <ul class="mb-0 mt-1 small">
-          ${data.duplicats.map(d => `<li>${d.nom} (${d.motiu})</li>`).join('')}
-        </ul>
-      </div>`;
-  } else {
-    document.getElementById('import-duplicates').innerHTML = '';
-  }
-
-  if (data.errors.length > 0) {
-    document.getElementById('import-errors').innerHTML = `
-      <div class="alert alert-danger">
-        <strong>❌ Files amb errors (no s'importaran):</strong>
-        <ul class="mb-0 mt-1 small">
-          ${data.errors.map(e => `<li>Fila ${e.fila}: ${e.motiu}</li>`).join('')}
-        </ul>
-      </div>`;
-  } else {
-    document.getElementById('import-errors').innerHTML = '';
-  }
-
+  const statsEl   = document.getElementById('import-stats');
   const btnConfirm = document.getElementById('btn-confirm-import');
-  btnConfirm.style.display = data.nous > 0 ? 'inline-block' : 'none';
+
+  // Errors bloquejants → mostrar i aturar
+  if (!data.ok && data.errors) {
+    btnConfirm.style.display = 'none';
+    const errorList = data.errors.map(e =>
+      `<li><strong>Fila ${e.fila} — ${e.nom}:</strong> ${e.motiu}</li>`
+    ).join('');
+    statsEl.innerHTML = `
+      <div class="alert alert-danger">
+        <strong>❌ ${data.errors.length} error(s) trobat(s) — No s'ha importat res</strong>
+        <p class="small mt-1 mb-1">${data.missatge}</p>
+        <ul class="mb-0 small">${errorList}</ul>
+      </div>`;
+    return;
+  }
+
+  // Preview ok
+  let html = `<div class="d-flex gap-2 flex-wrap mb-3">
+    <span class="badge bg-success fs-6">✅ ${data.nous} nous</span>
+    <span class="badge bg-primary fs-6">🔄 ${data.actualitzats} actualitzats</span>
+    <span class="badge bg-secondary fs-6">⏭️ ${data.sense_canvis} sense canvis</span>
+  </div>`;
+
+  if (data.detall.nous.length > 0) {
+    html += `<div class="mb-2">
+      <strong class="text-success">✅ Nous participants:</strong>
+      <span class="text-muted small">${data.detall.nous.join(', ')}</span>
+    </div>`;
+  }
+  if (data.detall.actualitzar.length > 0) {
+    html += `<div class="mb-2">
+      <strong class="text-primary">🔄 S'actualitzaran:</strong>
+      <span class="text-muted small">${data.detall.actualitzar.map(u => u.nom + (u.canvis.length ? ' (' + u.canvis.join(', ') + ')' : '')).join(' · ')}</span>
+    </div>`;
+  }
+
+  if (data.nous === 0 && data.actualitzats === 0) {
+    html += '<div class="alert alert-info mt-2">Cap canvi a realitzar.</div>';
+    btnConfirm.style.display = 'none';
+  } else {
+    btnConfirm.style.display = 'inline-block';
+  }
+
+  statsEl.innerHTML = html;
 }
 
 // Reset modal en tancar

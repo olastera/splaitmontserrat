@@ -1,0 +1,30 @@
+{
+    "id": "712131b1-d4b5-4bf3-ac9c-d40eb43d3cb5",
+    "nom": "Pau Lloreda Serra",
+    "email": "plloreda.serra@gmail.com",
+    "telefon": "634515535",
+    "password_enc": "KW8qkYFok6\/\/i3n+F\/6lGzo6aWpMNUNCZVJ2QUowaDkveW56QkVTdz09",
+    "ruta": "curta",
+    "motivacio": "",
+    "created_at": "2026-03-21T23:52:01+01:00",
+    "checkins": [
+        {
+            "parada_id": 3,
+            "timestamp": "2026-03-22T00:54:38+01:00"
+        },
+        {
+            "parada_id": 4,
+            "timestamp": "2026-03-22T00:54:42+01:00"
+        },
+        {
+            "parada_id": 5,
+            "timestamp": "2026-03-22T01:17:25+01:00",
+            "test": {
+                "p1": "Bé",
+                "p2": "Molt bo",
+                "p3": ""
+            }
+        }
+    ],
+    "share_location": false
+}
