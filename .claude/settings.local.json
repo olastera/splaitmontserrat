@@ -24,7 +24,10 @@
       "Bash(ls /usr/bin/php*)",
       "Bash(ls -la /home/oscar/iespai/www/splaitmontserrat/admin/*.php)",
       "Bash(grep:*)",
-      "Bash(python3 -m json.tool /home/oscar/iespai/www/splaitmontserrat/data/settings.json)"
+      "Bash(python3 -m json.tool /home/oscar/iespai/www/splaitmontserrat/data/settings.json)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/api/export_excel.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/api/download_template.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/api/import_excel.php)"
     ]
   }
 }

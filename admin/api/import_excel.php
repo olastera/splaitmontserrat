@@ -3,12 +3,9 @@ require_once '../../includes/config.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/user.php';
 require_once '../../includes/crypto.php';
-require_once '../../vendor/autoload.php';
-
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 header('Content-Type: application/json');
-if (!is_admin_logged_in()) { http_response_code(401); exit; }
+if (!is_admin_logged()) { http_response_code(401); exit; }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit; }
 
 $action = $_POST['action'] ?? 'preview'; // 'preview' o 'import'
@@ -20,17 +17,37 @@ if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
 }
 
 $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-if (!in_array($ext, ['xlsx', 'xls', 'csv'])) {
-    echo json_encode(['ok' => false, 'error' => 'Format no vàlid. Usa .xlsx, .xls o .csv']);
+if (!in_array($ext, ['csv'])) {
+    echo json_encode(['ok' => false, 'error' => 'Format no vàlid. Usa .csv (descarrega la plantilla)']);
     exit;
 }
 
-try {
-    $spreadsheet = IOFactory::load($file['tmp_name']);
-    $sheet       = $spreadsheet->getActiveSheet();
-    $rows        = $sheet->toArray();
-} catch (Exception $e) {
-    echo json_encode(['ok' => false, 'error' => 'No s\'ha pogut llegir el fitxer: ' . $e->getMessage()]);
+// Llegir CSV amb PHP natiu
+$rows = [];
+$handle = fopen($file['tmp_name'], 'r');
+if (!$handle) {
+    echo json_encode(['ok' => false, 'error' => 'No s\'ha pogut llegir el fitxer']);
+    exit;
+}
+
+// Detectar delimitador (punt i coma o coma)
+$first_line = fgets($handle);
+rewind($handle);
+
+// Eliminar BOM UTF-8 si existeix
+if (substr($first_line, 0, 3) === "\xEF\xBB\xBF") {
+    fread($handle, 3); // saltar BOM
+}
+
+$delimiter = (substr_count($first_line, ';') >= substr_count($first_line, ',')) ? ';' : ',';
+
+while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+    $rows[] = $row;
+}
+fclose($handle);
+
+if (empty($rows)) {
+    echo json_encode(['ok' => false, 'error' => 'El fitxer és buit o no és un CSV vàlid']);
     exit;
 }
 
@@ -60,7 +77,6 @@ foreach ($headers as $ci => $header) {
     $col_map[$h] = $ci;
 }
 
-// Validar columnes mínimes
 if (!isset($col_map['nom'])) {
     echo json_encode(['ok' => false, 'error' => 'Falta la columna "nom" a la capçalera.']);
     exit;
@@ -92,9 +108,15 @@ for ($ri = $header_row + 1; $ri < count($rows); $ri++) {
     $nom      = trim((string)($row[$col_map['nom']] ?? ''));
     $email    = strtolower(trim((string)($row[$col_map['email']] ?? '')));
     $telefon  = trim((string)($row[$col_map['telefon']] ?? ''));
-    $ruta     = strtolower(trim((string)($row[$col_map['ruta']] ?? $row[$col_map['ruta *']] ?? '')));
+    $ruta_raw = $col_map['ruta'] ?? null;
+    $ruta     = strtolower(trim((string)($ruta_raw !== null ? ($row[$ruta_raw] ?? '') : '')));
     $password = trim((string)($row[$col_map['contrasenya']] ?? ''));
     $motivacio = trim((string)($row[$col_map['motivacio']] ?? ''));
+
+    // Ignorar files d'exemple
+    if (str_contains(strtolower($password), 'automàtica') || str_contains(strtolower($password), 'automatica')) {
+        continue;
+    }
 
     // Validacions bàsiques
     if (empty($nom)) {
@@ -137,17 +159,17 @@ for ($ri = $header_row + 1; $ri < count($rows); $ri++) {
 
 if ($action === 'preview') {
     echo json_encode([
-        'ok'       => true,
-        'total'    => $total,
-        'nous'     => count($nous),
+        'ok'        => true,
+        'total'     => $total,
+        'nous'      => count($nous),
         'duplicats' => $duplicats,
-        'errors'   => $errors,
+        'errors'    => $errors,
     ]);
     exit;
 }
 
 // action === 'import' — crear usuaris nous
-$created = 0;
+$created       = 0;
 $import_errors = [];
 
 foreach ($nous as $u) {

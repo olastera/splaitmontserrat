@@ -126,13 +126,13 @@ foreach ($parades as $p) $parades_map[$p['id']] = $p;
 
   <div class="d-flex gap-2 flex-wrap mb-3">
     <a href="api/export_excel.php" class="btn btn-success">
-      <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
+      <i class="bi bi-file-earmark-spreadsheet me-1"></i>Exportar CSV
     </a>
     <a href="api/download_template.php" class="btn btn-outline-secondary">
-      <i class="bi bi-download me-1"></i>Baixar plantilla
+      <i class="bi bi-download me-1"></i>Baixar plantilla CSV
     </a>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-import">
-      <i class="bi bi-upload me-1"></i>Importar Excel
+      <i class="bi bi-upload me-1"></i>Importar CSV
     </button>
   </div>
 
@@ -141,22 +141,22 @@ foreach ($parades as $p) $parades_map[$p['id']] = $p;
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">📥 Importar participants des d'Excel</h5>
+          <h5 class="modal-title">📥 Importar participants des de CSV</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <div class="alert alert-info small">
             <strong>ℹ️ Abans d'importar:</strong>
             <ul class="mb-0 mt-1">
-              <li>Baixa la <strong>plantilla Excel</strong> per veure el format correcte</li>
+              <li>Baixa la <strong>plantilla CSV</strong> per veure el format correcte</li>
               <li>Els camps obligatoris són: <code>nom</code> i <code>email</code> o <code>telefon</code></li>
               <li>Si un participant ja existeix (mateix email/telèfon) <strong>no es modificarà</strong></li>
               <li>Es generarà una contrasenya automàtica per a cada participant nou</li>
             </ul>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-bold">Selecciona el fitxer Excel (.xlsx)</label>
-            <input type="file" class="form-control" id="import-file" accept=".xlsx,.xls,.csv">
+            <label class="form-label fw-bold">Selecciona el fitxer CSV (.csv)</label>
+            <input type="file" class="form-control" id="import-file" accept=".csv">
           </div>
           <div id="import-preview" style="display:none">
             <hr>
