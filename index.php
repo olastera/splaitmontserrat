@@ -7,12 +7,12 @@ if (is_logged_in()) {
     exit;
 }
 
-$settings        = get_settings();
-$registre_obert  = $settings['event']['registre_obert'] ?? true;
+$settings       = get_settings();
+$registre_obert = $settings['event']['registre_obert'] ?? true;
 
 $error   = '';
 $success = '';
-$tab     = 'registre';
+$tab     = $registre_obert ? 'registre' : 'login';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accio = $_POST['accio'] ?? '';
@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         }
+        } // end else (registre_obert)
     } elseif ($accio === 'login') {
         $tab = 'login';
         $identifier = strtolower(trim($_POST['identifier'] ?? ''));
@@ -102,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <!-- Pestanyes -->
       <ul class="nav nav-pills nav-pills-spait mb-4 justify-content-center" id="loginTabs" role="tablist">
+        <?php if ($registre_obert): ?>
         <li class="nav-item" role="presentation">
           <button class="nav-link <?= $tab === 'registre' ? 'active' : '' ?>"
                   id="tab-registre" data-bs-toggle="pill" data-bs-target="#pane-registre"
@@ -109,7 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="bi bi-person-plus me-1"></i>Registre
           </button>
         </li>
-        <li class="nav-item ms-2" role="presentation">
+        <?php endif; ?>
+        <li class="nav-item <?= $registre_obert ? 'ms-2' : '' ?>" role="presentation">
           <button class="nav-link <?= $tab === 'login' ? 'active' : '' ?>"
                   id="tab-login" data-bs-toggle="pill" data-bs-target="#pane-login"
                   type="button" role="tab">
@@ -238,6 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
           </form>
 
+          <?php if ($registre_obert): ?>
           <div class="text-center mt-3">
             <small class="text-muted">No tens compte?
               <a href="#" onclick="document.getElementById('tab-registre').click(); return false;">
@@ -245,6 +249,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </a>
             </small>
           </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
