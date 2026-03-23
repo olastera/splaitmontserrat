@@ -124,6 +124,61 @@ foreach ($parades as $p) $parades_map[$p['id']] = $p;
     </div>
   </div>
 
+  <div class="d-flex gap-2 flex-wrap mb-3">
+    <a href="api/export_excel.php" class="btn btn-success">
+      <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
+    </a>
+    <a href="api/download_template.php" class="btn btn-outline-secondary">
+      <i class="bi bi-download me-1"></i>Baixar plantilla
+    </a>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-import">
+      <i class="bi bi-upload me-1"></i>Importar Excel
+    </button>
+  </div>
+
+  <!-- Modal importació -->
+  <div class="modal fade" id="modal-import" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">📥 Importar participants des d'Excel</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info small">
+            <strong>ℹ️ Abans d'importar:</strong>
+            <ul class="mb-0 mt-1">
+              <li>Baixa la <strong>plantilla Excel</strong> per veure el format correcte</li>
+              <li>Els camps obligatoris són: <code>nom</code> i <code>email</code> o <code>telefon</code></li>
+              <li>Si un participant ja existeix (mateix email/telèfon) <strong>no es modificarà</strong></li>
+              <li>Es generarà una contrasenya automàtica per a cada participant nou</li>
+            </ul>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Selecciona el fitxer Excel (.xlsx)</label>
+            <input type="file" class="form-control" id="import-file" accept=".xlsx,.xls,.csv">
+          </div>
+          <div id="import-preview" style="display:none">
+            <hr>
+            <h6>Previsualització:</h6>
+            <div id="import-stats" class="mb-2"></div>
+            <div id="import-duplicates" class="mb-2"></div>
+            <div id="import-errors" class="mb-2"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+          <button type="button" class="btn btn-warning" id="btn-preview-import">
+            <i class="bi bi-eye me-1"></i>Previsualitzar
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-confirm-import" style="display:none">
+            <i class="bi bi-check-lg me-1"></i>Confirmar importació
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card shadow-sm">
     <div class="card-body p-0">
       <div class="table-responsive">
@@ -306,6 +361,110 @@ document.getElementById('btn-delete-all').addEventListener('click', function() {
         setTimeout(() => location.reload(), 1500);
       }
     });
+});
+
+// Importació Excel
+let parsedImportData = null;
+
+document.getElementById('btn-preview-import').addEventListener('click', function() {
+  const file = document.getElementById('import-file').files[0];
+  if (!file) { alert('Selecciona un fitxer primer'); return; }
+
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Analitzant...';
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('action', 'preview');
+
+  fetch('api/import_excel.php', { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-eye me-1"></i>Previsualitzar';
+      if (!data.ok) { alert('Error: ' + (data.error || 'Error desconegut')); return; }
+      parsedImportData = data;
+      showImportPreview(data);
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-eye me-1"></i>Previsualitzar';
+      alert('Error de connexió');
+    });
+});
+
+document.getElementById('btn-confirm-import').addEventListener('click', function() {
+  const file = document.getElementById('import-file').files[0];
+  if (!file) return;
+
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Important...';
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('action', 'import');
+
+  fetch('api/import_excel.php', { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Confirmar importació';
+      if (data.ok) {
+        showToast(`✅ ${data.created} participants importats correctament`, 'success');
+        bootstrap.Modal.getInstance(document.getElementById('modal-import')).hide();
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showToast('Error important: ' + (data.error || ''), 'danger');
+      }
+    });
+});
+
+function showImportPreview(data) {
+  document.getElementById('import-preview').style.display = 'block';
+  document.getElementById('import-stats').innerHTML = `
+    <div class="d-flex gap-2 flex-wrap">
+      <span class="badge bg-primary fs-6">${data.total} files llegides</span>
+      <span class="badge bg-success fs-6">${data.nous} nous participants</span>
+      <span class="badge bg-warning text-dark fs-6">${data.duplicats.length} duplicats</span>
+      <span class="badge bg-danger fs-6">${data.errors.length} errors</span>
+    </div>`;
+
+  if (data.duplicats.length > 0) {
+    document.getElementById('import-duplicates').innerHTML = `
+      <div class="alert alert-warning">
+        <strong>⚠️ Aquests participants ja existeixen i NO s'importaran:</strong>
+        <ul class="mb-0 mt-1 small">
+          ${data.duplicats.map(d => `<li>${d.nom} (${d.motiu})</li>`).join('')}
+        </ul>
+      </div>`;
+  } else {
+    document.getElementById('import-duplicates').innerHTML = '';
+  }
+
+  if (data.errors.length > 0) {
+    document.getElementById('import-errors').innerHTML = `
+      <div class="alert alert-danger">
+        <strong>❌ Files amb errors (no s'importaran):</strong>
+        <ul class="mb-0 mt-1 small">
+          ${data.errors.map(e => `<li>Fila ${e.fila}: ${e.motiu}</li>`).join('')}
+        </ul>
+      </div>`;
+  } else {
+    document.getElementById('import-errors').innerHTML = '';
+  }
+
+  const btnConfirm = document.getElementById('btn-confirm-import');
+  btnConfirm.style.display = data.nous > 0 ? 'inline-block' : 'none';
+}
+
+// Reset modal en tancar
+document.getElementById('modal-import').addEventListener('hidden.bs.modal', function() {
+  document.getElementById('import-file').value = '';
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('btn-confirm-import').style.display = 'none';
+  parsedImportData = null;
 });
 
 // Reset per nou any

@@ -178,6 +178,7 @@ function get_default_settings(): array {
             'missatge_final'      => 'HO HAS ACONSEGUIT!',
             'avis_global'         => '',
             'mode_prova'          => false,
+            'registre_obert'      => true,
         ],
         'visual' => [
             'logo_url'        => 'https://esplaispait.com/wp-content/uploads/2024/11/cropped-cropped-cropped-logo_splait-removebg-preview-1.png',
