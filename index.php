@@ -56,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         }
-        } // end else (registre_obert)
     } elseif ($accio === 'login') {
         $tab = 'login';
         $identifier = strtolower(trim($_POST['identifier'] ?? ''));
