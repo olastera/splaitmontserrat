@@ -30,10 +30,11 @@ function create_user(array $data): array {
         'email'        => strtolower(trim($data['email'] ?? '')),
         'telefon'      => trim($data['telefon'] ?? ''),
         'password_enc' => encrypt_password($data['password']),
-        'ruta'         => $data['ruta'] ?? 'curta',
-        'motivacio'    => trim($data['motivacio'] ?? ''),
-        'created_at'   => date('c'),
-        'checkins'     => [],
+        'ruta'           => $data['ruta'] ?? 'curta',
+        'motivacio'      => trim($data['motivacio'] ?? ''),
+        'created_at'     => date('c'),
+        'share_location' => false,
+        'checkins'       => [],
     ];
     save_user($user);
     return $user;

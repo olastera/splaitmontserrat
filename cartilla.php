@@ -505,16 +505,33 @@ function flushPending() {
 setInterval(flushPending, 30000);
 
 document.getElementById('toggle-share-location').addEventListener('change', function() {
-  sharingLocation = this.checked;
+  const checkbox = this;
+  sharingLocation = checkbox.checked;
   const label = document.getElementById('share-location-label');
   label.textContent = sharingLocation ? 'Temps real activat' : 'Actualitzacions pausades';
 
   fetch('toggle_location.php', {
     method: 'POST',
+    credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ share: sharingLocation })
-  }).then(r => r.json()).then(data => {
-    if (data.note) console.info(data.note);
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) {
+      // Revertir si el servidor no ha pogut guardar
+      checkbox.checked = !sharingLocation;
+      sharingLocation = checkbox.checked;
+      label.textContent = sharingLocation ? 'Temps real activat' : 'Actualitzacions pausades';
+      console.error('Error guardant ubicació:', data.error);
+    }
+  })
+  .catch(err => {
+    // Error de xarxa o resposta no vàlida — revertir
+    checkbox.checked = !sharingLocation;
+    sharingLocation = checkbox.checked;
+    label.textContent = sharingLocation ? 'Temps real activat' : 'Actualitzacions pausades';
+    console.error('Error de connexió en toggle ubicació:', err);
   });
 });
 

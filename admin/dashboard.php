@@ -83,7 +83,7 @@ $logo = $settings['visual']['logo_local'] ?: $settings['visual']['logo_url'];
         <i class="bi bi-gear me-1"></i>Configuració
       </a>
       <a href="export_csv.php" class="btn btn-sm btn-outline-warning">
-        <i class="bi bi-download me-1"></i>CSV
+        <i class="bi bi-download me-1"></i>Excel
       </a>
       <a href="logout.php" class="btn btn-sm btn-outline-danger">
         <i class="bi bi-box-arrow-right me-1"></i>Sortir
@@ -256,7 +256,7 @@ $logo = $settings['visual']['logo_local'] ?: $settings['visual']['logo_url'];
       <i class="bi bi-gear me-2"></i>Configuració
     </a>
     <a href="export_csv.php" class="btn btn-spait-groc btn-lg">
-      <i class="bi bi-file-earmark-spreadsheet me-2"></i>Exportar CSV
+      <i class="bi bi-file-earmark-spreadsheet me-2"></i>Exportar Excel
     </a>
   </div>
 </div>

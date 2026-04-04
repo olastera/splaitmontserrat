@@ -24,7 +24,22 @@
       "Bash(ls /usr/bin/php*)",
       "Bash(ls -la /home/oscar/iespai/www/splaitmontserrat/admin/*.php)",
       "Bash(grep:*)",
-      "Bash(python3 -m json.tool /home/oscar/iespai/www/splaitmontserrat/data/settings.json)"
+      "Bash(python3 -m json.tool /home/oscar/iespai/www/splaitmontserrat/data/settings.json)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/api/export_excel.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/api/download_template.php)",
+      "Bash(php -l /home/oscar/iespai/www/splaitmontserrat/admin/api/import_excel.php)",
+      "Read(//var/**)",
+      "Bash(find /etc/apache2 /etc/nginx /etc/httpd -name *.conf)",
+      "Bash(apache2ctl -S)",
+      "Bash(find /etc/apache2 -name *.conf)",
+      "Bash(php8.2 -r \"echo opcache_get_status\\(\\) ? ''opcache ON'' : ''opcache OFF'';\")",
+      "Bash(php8.1 -r \"echo opcache_get_status\\(\\) ? ''opcache ON'' : ''opcache OFF'';\")",
+      "Bash(php8.0 -r \"echo opcache_get_status\\(\\) ? ''opcache ON'' : ''opcache OFF'';\")",
+      "Bash(ls /usr/local/bin/php*)",
+      "Bash(find /usr -name php* -type f)",
+      "Bash(sudo ls:*)",
+      "Bash(sudo find:*)",
+      "Bash(sudo chgrp:*)"
     ]
   }
 }

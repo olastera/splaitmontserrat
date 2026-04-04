@@ -26,18 +26,12 @@ Web app per gestionar la caminada anual de l'**Esplai Spai-T** de Barcelona/Terr
 ### 🔐 Administrador
 - Mapa en temps real de tots els participants
 - Gestió completa de participants (veure, reset de contrasenya, eliminar)
-- Exportació CSV de participants
+- Configuració de punts de parada amb mapa interactiu
+- Preguntes del test editables per cada parada
+- Configuració visual (logo, colors, nom de l'app)
 - Toggle GPS: activar/desactivar requisit de proximitat per al check-in
+- Exportació CSV de participants
 - Zona de perill: eliminar usuaris de prova / tots / reset per nou any
-
-### ⚙️ Admin Universal *(branca `admin-universal`)*
-- **Configuració visual** → logo, colors corporatius, nom de l'app (color picker en temps real)
-- **Gestió de parades** → afegir/editar/eliminar/reordenar punts amb drag & drop i mapa interactiu
-- **Preguntes editables** → fins a 3 preguntes per parada, tipus opcions / text lliure / estrelles
-- **Gestió d'usuaris** → eliminar individual, eliminar proves, eliminar tots, reset per nou any
-- **Codi mestre** → codi que funciona a qualsevol parada per si el responsable l'oblida
-- **Avís global** → banner visible a tots els participants en temps real
-- **Mode prova** → check-ins no compten, per fer tests abans del dia
 
 ---
 
@@ -74,15 +68,6 @@ Web app per gestionar la caminada anual de l'**Esplai Spai-T** de Barcelona/Terr
 
 ---
 
-## 🌿 Branques
-
-| Branca | Contingut |
-|--------|-----------|
-| `master` | Versió estable i funcional |
-| `admin-universal` | Admin configurable — en desenvolupament |
-
----
-
 ## 🚀 Instal·lació
 
 ### Requisits
@@ -92,14 +77,14 @@ Web app per gestionar la caminada anual de l'**Esplai Spai-T** de Barcelona/Terr
 
 ### Amb Docker (recomanat)
 ```bash
-git clone https://github.com/olastera/splaitmontserrat.git
+git clone https://github.com/el-teu-usuari/splaitmontserrat.git
 cd splaitmontserrat
 docker-compose up -d
 ```
 
 ### Manual
 ```bash
-git clone https://github.com/olastera/splaitmontserrat.git
+git clone https://github.com/el-teu-usuari/splaitmontserrat.git
 cd splaitmontserrat
 
 # Crear carpetes de dades
@@ -144,12 +129,6 @@ L'app és **universal**: qualsevol esplai o grup pot adaptar-la a la seva camina
 ├── update_position.php    ← endpoint GPS
 ├── toggle_location.php    ← endpoint privacitat
 ├── admin/                 ← panel d'administració
-│   ├── configuracio.php   ← configuració general + visual
-│   ├── parades.php        ← gestió parades (drag & drop)
-│   ├── parada_edit.php    ← crear/editar parada + mapa
-│   ├── usuaris.php        ← gestió usuaris
-│   ├── mapa.php           ← mapa temps real
-│   └── api/               ← endpoints AJAX admin
 ├── includes/              ← lògica PHP
 │   ├── config.php         ← configuració (NO al git)
 │   ├── auth.php
@@ -196,5 +175,4 @@ Si l'uses per a la teva caminada, ens alegrem molt! 🏔️
 
 Desenvolupat per i per a l'**Esplai Spai-T** — La Marina de Port, Barcelona.
 
-🌐 [esplaispait.com](https://esplaispait.com) · 
-🐙 [github.com/olastera/splaitmontserrat](https://github.com/olastera/splaitmontserrat)
+🌐 [esplaispait.com](https://esplaispait.com)

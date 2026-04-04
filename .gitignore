@@ -16,17 +16,18 @@ assets/img/logo_*
 # Editor
 .vscode/
 .idea/
-*:Zone.Identifier
 
 # Windows / WSL
 *:Zone.Identifier
-Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 *.lnk
 ehthumbs.db
-
-# VSCode Windows
-.vscode/
 *.code-workspace
+
+# Prompts Claude Code
 CLAUDE_CODE_PROMPT*.md
+
+# Composer
+vendor/
+composer.lock
