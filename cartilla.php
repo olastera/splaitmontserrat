@@ -15,6 +15,7 @@ if (!$user) {
 $settings = get_settings();
 $parades  = $settings['parades'] ?? [];
 $gps_radi = $settings['checkin']['radi_metres'] ?? 200;
+$require_gps = $settings['checkin']['require_gps'] ?? false;
 $avis     = $settings['event']['avis_global'] ?? '';
 
 // Filtrar parades per ruta de l'usuari
@@ -161,7 +162,7 @@ $nom_curt = explode(' ', $user['nom'])[0];
         </span>
         <?php if (!$acabat && $propera_parada): ?>
         <button class="btn btn-success btn-checkin" id="btn-checkin"
-                <?= $gps_override ? '' : 'disabled' ?>
+                <?= $require_gps ? 'disabled' : '' ?>
                 data-parada-id="<?= $propera_parada['id'] ?>"
                 data-parada-nom="<?= htmlspecialchars($propera_parada['nom']) ?>">
           <i class="bi bi-qr-code-scan me-1"></i>Check-in!
@@ -347,7 +348,7 @@ const CHECKIN_IDS  = <?= $checkins_json ?>;
 const PROPERA      = <?= $propera_json ?>;
 const RUTA_USUARI  = <?= json_encode($ruta) ?>;
 const ACABAT       = <?= json_encode($acabat) ?>;
-const GPS_OVERRIDE = <?= json_encode($gps_override) ?>;
+const GPS_REQUIRE  = <?= json_encode($require_gps) ?>;
 const GPS_RADI     = <?= (int)$gps_radi ?>;
 
 // ============= MAPA LEAFLET =============
@@ -458,7 +459,7 @@ function updateGPS(pos) {
     document.getElementById('temps-val').textContent = formatTemps(dist);
 
     const btnCheckin = document.getElementById('btn-checkin');
-    if (btnCheckin && !GPS_OVERRIDE) {
+    if (btnCheckin && GPS_REQUIRE) {
       if (dist <= GPS_RADI) {
         btnCheckin.disabled = false;
         btnCheckin.title = '';
