@@ -267,3 +267,120 @@ $TESTS = [
     'p3' => ['pregunta' => 'Un missatge per guardar per sempre',        'tipus' => 'text'],
   ],
 ];
+
+// ===== RANKING FUNCTIONS =====
+
+/**
+ * Obtenir ranking per parada (top 10 usuaris que arriben primer)
+ * @param int $parada_id ID de la parada
+ * @return array Array de usuaris amb timestamp
+ */
+function get_ranking_by_stop(int $parada_id): array {
+    require_once __DIR__ . '/user.php';
+
+    $ranking = [];
+    $all_users = get_all_users();
+
+    foreach ($all_users as $user) {
+        $checkins = $user['checkins'] ?? [];
+        foreach ($checkins as $checkin) {
+            if ($checkin['parada_id'] === $parada_id) {
+                $ranking[] = [
+                    'nom'       => $user['nom'],
+                    'id'        => $user['id'],
+                    'timestamp' => $checkin['timestamp'],
+                    'hora'      => date('H:i', strtotime($checkin['timestamp'])),
+                ];
+                break;
+            }
+        }
+    }
+
+    // Ordenar por timestamp (primero es más antiguo = llegó primero)
+    usort($ranking, function($a, $b) {
+        return strtotime($a['timestamp']) - strtotime($b['timestamp']);
+    });
+
+    return array_slice($ranking, 0, 10);
+}
+
+/**
+ * Obtenir ranking general (top 10 usuaris per parades completadas)
+ * @return array Array de usuaris amb contador de parades
+ */
+function get_overall_ranking(): array {
+    require_once __DIR__ . '/user.php';
+
+    $ranking = [];
+    $all_users = get_all_users();
+
+    foreach ($all_users as $user) {
+        $checkins = $user['checkins'] ?? [];
+
+        // Contar check-ins (excluyendo punto de inicio si es necesario)
+        $parada_ids = array_column($checkins, 'parada_id');
+
+        if (!empty($parada_ids)) {
+            $ranking[] = [
+                'nom'       => $user['nom'],
+                'id'        => $user['id'],
+                'parades'   => count($parada_ids),
+                'ultima'    => end($parada_ids),
+                'ruta'      => $user['ruta'] ?? 'curta',
+                'timestamp' => end($checkins)['timestamp'] ?? null,
+            ];
+        }
+    }
+
+    // Ordenar por cantidad de paradas (descendente)
+    usort($ranking, function($a, $b) {
+        if ($a['parades'] === $b['parades']) {
+            // Si tienen igual cantidad de paradas, ordenar por timestamp (quien terminó primero)
+            $ts_a = strtotime($a['timestamp'] ?? '1970-01-01');
+            $ts_b = strtotime($b['timestamp'] ?? '1970-01-01');
+            return $ts_a - $ts_b;
+        }
+        return $b['parades'] - $a['parades'];
+    });
+
+    return array_slice($ranking, 0, 10);
+}
+
+/**
+ * Obtenir nombre de la parada por ID
+ * @param int $parada_id ID de la parada
+ * @return string Nombre de la parada
+ */
+function get_parada_name(int $parada_id): string {
+    $settings = get_settings();
+    $parades = $settings['parades'] ?? [];
+
+    foreach ($parades as $p) {
+        if ($p['id'] === $parada_id) {
+            return $p['nom'];
+        }
+    }
+
+    global $PARADES;
+    foreach ($PARADES as $p) {
+        if ($p['id'] === $parada_id) {
+            return $p['nom'];
+        }
+    }
+
+    return 'Parada ' . $parada_id;
+}
+
+/**
+ * Obtenir medalla según posición
+ * @param int $posicion Posición en el ranking (1-based)
+ * @return string Emoji de medalla
+ */
+function get_medal(int $posicion): string {
+    return match($posicion) {
+        1 => '🥇',
+        2 => '🥈',
+        3 => '🥉',
+        default => '  ',
+    };
+}
