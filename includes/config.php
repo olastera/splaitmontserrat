@@ -130,12 +130,16 @@ function get_default_settings(): array {
 
     // Convertir format antic de parades al format nou
     $parades_new = [];
-    foreach ($PARADES as $p) {
+
+    // Si $PARADES no está definido, usar array vacío
+    $parades_to_process = $PARADES ?? [];
+
+    foreach ($parades_to_process as $p) {
         $ruta = $p['ruta'] ?? 'ambdues';
         $rutes = ($ruta === 'ambdues') ? ['llarga', 'curta'] : [$ruta];
         $id = $p['id'];
         $preguntes = [];
-        if (isset($TESTS[$id])) {
+        if (!empty($TESTS) && isset($TESTS[$id])) {
             $idx = 1;
             foreach ($TESTS[$id] as $key => $q) {
                 $preguntes[] = [
@@ -164,6 +168,25 @@ function get_default_settings(): array {
             $np['es_inici_ruta'] = 'curta';
         }
         $parades_new[] = $np;
+    }
+
+    // Si no hay parades, asegurar que al menos devolvemos las $PARADES básicas
+    if (empty($parades_new) && !empty($PARADES)) {
+        foreach ($PARADES as $p) {
+            $parades_new[] = [
+                'id'                => $p['id'],
+                'nom'               => $p['nom'],
+                'rutes'             => ($p['ruta'] ?? 'ambdues') === 'ambdues' ? ['llarga', 'curta'] : [($p['ruta'] ?? 'ambdues')],
+                'lat'               => $p['lat'],
+                'lng'               => $p['lng'],
+                'codi'              => $p['codi'],
+                'radi_metres'       => null,
+                'es_inici'          => !empty($p['inici']),
+                'es_final'          => !empty($p['final']),
+                'missatge_arribada' => '',
+                'preguntes'         => [],
+            ];
+        }
     }
 
     return [
