@@ -36,7 +36,7 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
         <a href="#etapes" class="btn btn-spait">
           <span class="fw-semibold">Com començar</span>
         </a>
-        <a href="docs/Ruta 2026.pdf" class="btn btn-outline-light" target="_blank" rel="noopener">
+        <a href="Normes-Ruta-2026.pdf" class="btn btn-outline-light text-white" target="_blank" rel="noopener" download>
           <i class="bi bi-file-earmark-pdf me-2" aria-hidden="true"></i>Descarrega PDF
         </a>
       </div>
