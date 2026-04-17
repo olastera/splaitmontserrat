@@ -25,13 +25,13 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
 </head>
 <body class="normes-body">
   <header class="normes-hero text-center text-white">
-    <div class="container py-5">
+    <div class="container py-3">
       <?php if ($logo): ?>
-        <img src="<?= htmlspecialchars($logo) ?>" alt="Logo Esplai Spai-T" class="normes-logo mb-3">
+        <img src="<?= htmlspecialchars($logo) ?>" alt="Logo Esplai Spai-T" class="normes-logo mb-2" height="40">
       <?php endif; ?>
-      <p class="normes-subtitle">Reunió Ruta 2026</p>
-      <h1 class="display-3 fw-bold">Normes de la Caminada</h1>
-      <p class="lead">Tot el que necessites abans de posar-te les botes.</p>
+      <p class="normes-subtitle mb-1">Reunió Ruta 2026</p>
+      <h1 class="h2 fw-bold mb-2">Normes de la Caminada</h1>
+      <p class="small mb-0">Tot el que necessites abans de posar-te les botes.</p>
     </div>
   </header>
 
