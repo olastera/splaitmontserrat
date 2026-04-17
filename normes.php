@@ -32,14 +32,6 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
       <p class="normes-subtitle">Reunió Ruta 2026</p>
       <h1 class="display-3 fw-bold">Normes de la Caminada</h1>
       <p class="lead">Tot el que necessites abans de posar-te les botes.</p>
-      <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-        <a href="#etapes" class="btn btn-spait btn-lg px-4">
-          <span class="fw-semibold">Com començar</span>
-        </a>
-        <a href="Normes-Ruta-2026.pdf" class="btn btn-light text-dark btn-lg px-4" target="_blank" rel="noopener" download>
-          <i class="bi bi-file-earmark-pdf me-2" aria-hidden="true"></i>Descarrega PDF
-        </a>
-      </div>
     </div>
   </header>
 
@@ -190,7 +182,14 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
   </main>
 
   <footer class="normes-footer text-center py-4">
-    <p class="mb-2">Som d'esplai, res no ens atura!</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-3">
+      <a href="#com-funciona" class="btn btn-spait">
+        <i class="bi bi-arrow-repeat me-1"></i>Començar de nou
+      </a>
+      <a href="Normes-Ruta-2026.pdf" class="btn btn-light text-dark" target="_blank" rel="noopener" download>
+        <i class="bi bi-file-earmark-pdf me-2" aria-hidden="true"></i>Descarrega PDF
+      </a>
+    </div>
     <div class="d-flex justify-content-center gap-3">
       <a href="cartilla.php" class="btn btn-link text-warning">Torna a la cartilla</a>
       <a href="index.php" class="btn btn-link text-warning">Inicia sessió</a>
