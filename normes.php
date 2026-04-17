@@ -44,6 +44,27 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
   </header>
 
   <main class="normes-content container py-5">
+    <?php if (!empty($normes['com_funciona'])): ?>
+    <section id="com-funciona" class="normes-section">
+      <span class="normes-tag">00</span>
+      <h2 class="mb-3"><?= htmlspecialchars($normes['com_funciona']['titol']) ?></h2>
+      <p class="mb-4"><?= htmlspecialchars($normes['com_funciona']['intro']) ?></p>
+      <div class="normes-comfun">
+        <?php foreach ($normes['com_funciona']['passos'] as $pas): ?>
+          <div class="normes-comfun-item">
+            <div class="normes-comfun-icon">
+              <i class="<?= htmlspecialchars($pas['icona']) ?>"></i>
+            </div>
+            <div>
+              <h4><?= htmlspecialchars($pas['titol']) ?></h4>
+              <p class="mb-0 text-muted"><?= htmlspecialchars($pas['text']) ?></p>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </section>
+    <?php endif; ?>
+
     <section id="etapes" class="normes-section">
       <span class="normes-tag">01</span>
       <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
@@ -104,7 +125,7 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
     </section>
 
     <section class="normes-section">
-      <span class="normes-tag">03</span>
+      <span class="normes-tag">04</span>
       <h2 class="mb-3">Consells ràpids</h2>
       <div class="normes-consells">
         <?php foreach ($normes['consells'] as $tip): ?>

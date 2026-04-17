@@ -1,6 +1,17 @@
 <?php
 
 return [
+    'com_funciona' => [
+        'titol' => "Com funciona l'app?",
+        'intro' => "La Cartilla del Pelegrí t'acompanya durant tota la caminada. Aquí tens tot el que has de saber:",
+        'passos' => [
+            ['icona' => 'bi bi-qr-code-scan', 'titol' => 'Check-in a cada parada', 'text' => "Quan arribis a una parada, introdueix el codi secret que et donaran o escaneja el codi QR. Així podràs validar que has passat per cada punt!"],
+            ['icona' => 'bi bi-geo-alt', 'titol' => 'El teu mapa', 'text' => "El mapa mostra la teva posició en temps real i la de tots els participants. Els monitors el segueixen des de l'administració per garantir la seguretat de tothom."],
+            ['icona' => 'bi bi-eye-slash', 'titol' => 'La teva privacitat', 'text' => "Pots activar o desactivar les actualitzacions de posició en temps real des del botó de la barra inferior. Recorda: l'última posició sempre es guarda per seguretat."],
+            ['icona' => 'bi bi-trophy', 'titol' => 'Ranking i progrés', 'text' => "Ves mirant el teu progrés a la cartilla! Quan completis una parada, apareixerà marcada. També pots veure el ranking general des del botó corresponent."],
+            ['icona' => 'bi bi-file-pdf', 'titol' => 'La teva cartilla PDF', 'text' => "Un cop tinguis alguna parada completada, pots descarregar la teva cartilla personalitzada en PDF des de les normes."],
+        ],
+    ],
     'etapes' => [
         ['tram' => 'Barcelona ➜ Sant Cugat', 'notes' => 'Sopem. Pot variar si Collserola està tancada.', 'ruta' => 'llarga'],
         ['tram' => 'Sant Cugat ➜ Can Barata', 'notes' => '', 'ruta' => 'llarga'],

@@ -553,3 +553,38 @@ html {
 .normes-footer a:hover {
   color: #ffd86b;
 }
+
+.normes-comfun {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.normes-comfun-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.normes-comfun-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--spait-vermell, #C0392B), var(--spait-verd, #27AE60));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: white;
+}
+
+.normes-comfun-item h4 {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--spait-fosc, #2C3E50);
+}
