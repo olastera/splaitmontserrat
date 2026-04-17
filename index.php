@@ -240,6 +240,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
           </form>
 
+          <a href="normes.php" target="_blank" class="btn btn-outline-secondary w-100 mt-3">
+            <i class="bi bi-journal-text me-1"></i>Consulta les normes de la ruta
+          </a>
+
           <?php if ($registre_obert): ?>
           <div class="text-center mt-3">
             <small class="text-muted">No tens compte?

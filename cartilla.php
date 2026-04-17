@@ -117,6 +117,9 @@ $nom_curt = explode(' ', $user['nom'])[0];
     <a href="ranking.php" class="btn btn-sm btn-outline-light" title="Ranking">
       <i class="bi bi-trophy"></i><span class="d-none d-sm-inline ms-1">Ranking</span>
     </a>
+    <a href="normes.php" class="btn btn-sm btn-outline-light" title="Normes de la ruta">
+      <i class="bi bi-journal-text"></i><span class="d-none d-sm-inline ms-1">Normes</span>
+    </a>
     <a href="logout.php" class="btn btn-sm btn-outline-light" title="Sortir">
       <i class="bi bi-box-arrow-right"></i>
     </a>
@@ -349,6 +352,14 @@ $nom_curt = explode(' ', $user['nom'])[0];
         <a href="logout.php" class="btn btn-outline-secondary btn-sm w-100">
           <i class="bi bi-box-arrow-left me-1"></i>Sortir / Tancar sessió
         </a>
+        
+        <!-- Enllaç a normes -->
+        <div class="mt-3 pt-2 border-top">
+          <small class="text-muted">Mentrestant, pots revisar les</small>
+          <a href="normes.php" target="_blank" class="d-block mt-1 fw-semibold">
+            <i class="bi bi-journal-text me-1"></i>Normes de la ruta
+          </a>
+        </div>
         
       </div>
     </div>

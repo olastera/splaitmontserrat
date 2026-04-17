@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="mtnGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d4a574"/>
+      <stop offset="100%" stop-color="#c08e64"/>
+    </linearGradient>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8efe6"/>
+      <stop offset="100%" stop-color="#f4d8bf"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#skyGrad)"/>
+  <path d="M0 600 L0 400 Q150 300 300 380 Q450 320 550 350 Q700 280 850 340 Q1000 400 1200 320 L1200 600 Z" fill="url(#mtnGrad)" opacity="0.6"/>
+  <path d="M0 600 L0 450 Q200 380 400 420 Q600 350 800 400 Q1000 360 1200 450 L1200 600 Z" fill="#d4a574" opacity="0.4"/>
+  <path d="M0 600 L0 500 Q300 420 500 480 Q700 420 900 470 Q1100 420 1200 500 L1200 600 Z" fill="#c08e64" opacity="0.3"/>
+</svg>

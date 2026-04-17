@@ -1,0 +1,68 @@
+<?php
+
+return [
+    'etapes' => [
+        ['tram' => 'Barcelona ➜ Sant Cugat', 'notes' => 'Sopem. Pot variar si Collserola està tancada.', 'ruta' => 'llarga'],
+        ['tram' => 'Sant Cugat ➜ Can Barata', 'notes' => '', 'ruta' => 'llarga'],
+        ['tram' => 'Can Barata ➜ Les Fonts', 'notes' => 'Ens unim a la ruta curta.', 'ruta' => 'ambdues'],
+        ['tram' => 'Les Fonts ➜ Quatre Vents', 'notes' => '', 'ruta' => 'ambdues'],
+        ['tram' => 'Quatre Vents ➜ Can Cabassa', 'notes' => '', 'ruta' => 'ambdues'],
+        ['tram' => 'Can Cabassa ➜ Oasi', 'notes' => '', 'ruta' => 'ambdues'],
+        ['tram' => 'Oasi ➜ Olesa (esmorzar)', 'notes' => '', 'ruta' => 'ambdues'],
+        ['tram' => 'Olesa ➜ Aeri', 'notes' => '', 'ruta' => 'ambdues'],
+        ['tram' => 'Aeri ➜ Monistrol', 'notes' => '', 'ruta' => 'ambdues'],
+        ['tram' => 'Monistrol ➜ Monestir', 'notes' => 'Pendent de concretar', 'ruta' => 'ambdues'],
+    ],
+    'materials' => [
+        'caminar' => [
+            'Motxilla petita còmode',
+            'Cantimplora petita',
+            'Botes de muntanya',
+            'Mitjons d’esport + recanvi',
+            'Capelina',
+            'Roba d’abric capa a capa',
+            'Ulleres de sol i crema solar',
+            'Got reutilitzable amb nom',
+            'Buff i guants',
+            'Cacao labial + cremes calor/vaselina',
+            'Esmorzar i sopar',
+            'Frontal + piles',
+            'Pals i barret (optatiu)',
+            'Targeta 3 zones (ruta curta)',
+        ],
+        'pernocta' => [
+            'Sac de dormir i coixí',
+            'Pijama + sabatilles',
+            'Tovallola i necesser',
+            'Mudes dissabte i diumenge',
+            'Calçat còmode',
+            'Dinar dissabte',
+            'Motxilla extra a l’esplai divendres',
+        ],
+    ],
+    'consells' => [
+        'Fes esport lleuger les setmanes prèvies.',
+        'No et tallis les ungles el dia abans.',
+        'Porta sabates ja utilitzades i en bon estat.',
+        'Dina carbohidrats i sopa lleuger però contundent.',
+        'Assegura piles del frontal i descansa bé.',
+        'Evita carregar massa pes.',
+        'No oblidis caputxa per pluja i vent.',
+    ],
+    'normes' => [
+        'generals' => [
+            'Caminem en grup, sense adelantar el primer moni.',
+            'Ningú queda enrere del/la monitor/a escombra.',
+            'El ritme el marca el monitor de capçalera.',
+            'Si cal parar, avisa immediatament a un moni.',
+            'Fem cas als cotxes escombra en cada parada.',
+        ],
+        'tritons' => [
+            'Recorda que anem amb menors.',
+            'No fumar mentre estiguem amb el grup.',
+            'Donem exemple en tot moment.',
+        ],
+    ],
+    'termos' => 'Necessitem termos amb llet, cafè o caldo per divendres a la tarda. Si pots aportar o omplir-ne, contacta amb la comissió.',
+    'preguntes' => 'Tens dubtes? Escriu al contacte oficial que apareix al formulari o parla amb el teu moni de referència.',
+];
