@@ -109,11 +109,6 @@ $nom_curt = explode(' ', $user['nom'])[0];
     <span class="text-white small d-none d-sm-inline">
       <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($nom_curt) ?>
     </span>
-    <?php if ($progress['completades'] > 0): ?>
-    <a href="download_pdf.php" class="btn btn-sm btn-spait-groc" title="Descarregar cartilla PDF">
-      <i class="bi bi-file-pdf me-1"></i><span class="d-none d-sm-inline">PDF</span>
-    </a>
-    <?php endif; ?>
     <a href="ranking.php" class="btn btn-sm btn-outline-light" title="Ranking">
       <i class="bi bi-trophy"></i><span class="d-none d-sm-inline ms-1">Ranking</span>
     </a>
