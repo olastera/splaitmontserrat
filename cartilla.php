@@ -8,6 +8,7 @@ function ha_iniciat_ruta(array $user): bool {
     if (empty($user['checkins'])) return false;
     foreach ($user['checkins'] as $ci) {
         if (!empty($ci['inici'])) return true;
+        if (!empty($ci['tipus']) && $ci['tipus'] === 'inici_ruta') return true;
     }
     return false;
 }
@@ -90,6 +91,7 @@ $nom_curt = explode(' ', $user['nom'])[0];
     .app-container { display: flex; flex-direction: column; height: 100vh; }
     .map-section { flex: 0 0 auto; position: relative; }
     .cartilla-section { flex: 1 1 auto; overflow-y: auto; }
+    .cartilla-section.no-scroll { overflow-y: visible; }
   </style>
 </head>
 <body>
@@ -191,7 +193,7 @@ $nom_curt = explode(' ', $user['nom'])[0];
   </div>
 
   <!-- CARTILLA -->
-  <div class="cartilla-section">
+  <div class="cartilla-section no-scroll">
     <?php if ($acabat): ?>
     <div class="missatge-final m-3">
       <div style="font-size:3rem;">🏔️🎉</div>
