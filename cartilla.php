@@ -112,6 +112,9 @@ $nom_curt = explode(' ', $user['nom'])[0];
       <i class="bi bi-file-pdf me-1"></i><span class="d-none d-sm-inline">PDF</span>
     </a>
     <?php endif; ?>
+    <a href="ranking.php" class="btn btn-sm btn-outline-light" title="Ranking">
+      <i class="bi bi-trophy"></i><span class="d-none d-sm-inline ms-1">Ranking</span>
+    </a>
     <a href="logout.php" class="btn btn-sm btn-outline-light" title="Sortir">
       <i class="bi bi-box-arrow-right"></i>
     </a>
@@ -414,6 +417,9 @@ const GPS_REQUIRE  = <?= json_encode($require_gps) ?>;
 const GPS_RADI     = <?= (int)$gps_radi ?>;
 const CAL_MODAL_INICI = <?= $cal_modal_inici ? 'true' : 'false' ?>;
 const INICI_RUTA = <?= json_encode($inici_ruta_iso) ?>;
+
+console.log('DEBUG - CAL_MODAL_INICI:', CAL_MODAL_INICI);
+console.log('DEBUG - INICI_RUTA:', INICI_RUTA);
 
 // ============= MAPA LEAFLET =============
 const map = L.map('map', { zoomControl: true });
@@ -788,6 +794,8 @@ document.getElementById('btn-iniciar-ruta')?.addEventListener('click', function(
     const codi = document.getElementById('codi-inici').value.trim().toUpperCase();
     const errorDiv = document.getElementById('inici-error');
     
+    console.log('DEBUG - Codi introduit:', codi);
+    
     if (!codi) {
         errorDiv.textContent = 'Introdueix el codi secret.';
         errorDiv.classList.remove('d-none');
@@ -795,6 +803,7 @@ document.getElementById('btn-iniciar-ruta')?.addEventListener('click', function(
     }
     
     this.disabled = true;
+    console.log('DEBUG - Enviant request...');
     
     fetch('iniciar_ruta.php', {
         method: 'POST',

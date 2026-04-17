@@ -53,6 +53,14 @@ if (isset($_POST['admin_remove_checkin'])) {
     $msg_ok = 'Check-in eliminat.';
 }
 
+// Eliminar TOTS els check-ins
+if (isset($_POST['admin_clear_all_checkins'])) {
+    $user['checkins'] = [];
+    save_user($user);
+    $user   = get_user($id);
+    $msg_ok = 'Tots els check-ins eliminats.';
+}
+
 $parades_map = [];
 foreach ($PARADES as $p) { $parades_map[$p['id']] = $p; }
 
@@ -184,8 +192,17 @@ $pw_plain = null; // no es mostra la contrasenya actual
 
       <!-- Historial check-ins -->
       <div class="card shadow-sm mb-4">
-        <div class="card-header" style="background:#2C3E50;color:white">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background:#2C3E50;color:white">
           <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historial de check-ins</h5>
+          <?php if (!empty($user['checkins'])): ?>
+          <form method="POST" action="participant_detail.php?id=<?= urlencode($id) ?>"
+                onsubmit="return confirm('Eliminar TOTS els check-ins d\'aquest usuari?')">
+            <input type="hidden" name="admin_clear_all_checkins" value="1">
+            <button type="submit" class="btn btn-sm btn-danger">
+              <i class="bi bi-trash me-1"></i>Esborrar tots
+            </button>
+          </form>
+          <?php endif; ?>
         </div>
         <div class="card-body p-0">
           <?php if (empty($user['checkins'])): ?>
@@ -199,10 +216,18 @@ $pw_plain = null; // no es mostra la contrasenya actual
             ?>
             <li class="list-group-item d-flex align-items-center gap-3">
               <span class="fs-4"><?= $es_final ? '🏆' : '✅' ?></span>
-              <div>
+              <div class="flex-grow-1">
                 <strong><?= htmlspecialchars($p ? $p['nom'] : 'Parada ' . $ci['parada_id']) ?></strong><br>
                 <small class="text-muted"><i class="bi bi-clock me-1"></i><?= $hora ?></small>
               </div>
+              <form method="POST" action="participant_detail.php?id=<?= urlencode($id) ?>"
+                    onsubmit="return confirm('Eliminar check-in de «<?= htmlspecialchars($p ? $p['nom'] : 'Parada ' . $ci['parada_id'], ENT_QUOTES) ?>»?')">
+                <input type="hidden" name="admin_remove_checkin" value="1">
+                <input type="hidden" name="parada_id" value="<?= $ci['parada_id'] ?>">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
             </li>
             <?php endforeach; ?>
           </ul>
