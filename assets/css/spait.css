@@ -398,3 +398,20 @@ html {
   font-style: italic;
   font-size: 1.1rem;
 }
+
+/* ============= COMPTADOR INICI RUTA ============= */
+.comptador-container {
+  margin-bottom: 1.5rem;
+}
+
+.comptador-display {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid var(--spait-vermell, #C0392B);
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  display: inline-block;
+}
+
+.text-spait {
+  color: var(--spait-vermell, #C0392B);
+}

@@ -90,15 +90,23 @@ $logo     = $vis['logo_local'] ?: ($vis['logo_url'] ?? '');
             <input type="text" class="form-control" id="ev_organitzacio" value="<?= htmlspecialchars($ev['organitzacio'] ?? '') ?>">
           </div>
           <div class="row">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
               <label class="form-label fw-semibold">Data de l'esdeveniment</label>
               <input type="date" class="form-control" id="ev_data" value="<?= htmlspecialchars($ev['data_esdeveniment'] ?? '') ?>">
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-clock me-1"></i>Hora inici ruta
+              </label>
+              <input type="time" class="form-control" id="ev_inici_ruta_hora" 
+                     value="<?= htmlspecialchars($ev['inici_ruta_hora'] ?? '') ?>"
+                     placeholder="07:00">
+            </div>
+            <div class="col-md-3 mb-3">
               <label class="form-label fw-semibold">Inici inscripcions</label>
               <input type="date" class="form-control" id="ev_inici" value="<?= htmlspecialchars($ev['dates_actives']['inici'] ?? '') ?>">
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
               <label class="form-label fw-semibold">Fi inscripcions</label>
               <input type="date" class="form-control" id="ev_fi" value="<?= htmlspecialchars($ev['dates_actives']['fi'] ?? '') ?>">
             </div>
@@ -374,6 +382,7 @@ function desarEvent() {
     nom:                 document.getElementById('ev_nom').value,
     organitzacio:        document.getElementById('ev_organitzacio').value,
     data_esdeveniment:   document.getElementById('ev_data').value,
+    inici_ruta_hora:     document.getElementById('ev_inici_ruta_hora').value,
     web:                 document.getElementById('ev_web').value,
     contacte:            document.getElementById('ev_contacte').value,
     missatge_benvinguda: document.getElementById('ev_benvinguda').value,
@@ -405,6 +414,7 @@ function desarControl() {
     nom:                 document.getElementById('ev_nom')?.value ?? '',
     organitzacio:        document.getElementById('ev_organitzacio')?.value ?? '',
     data_esdeveniment:   document.getElementById('ev_data')?.value ?? '',
+    inici_ruta_hora:     document.getElementById('ev_inici_ruta_hora').value,
     web:                 document.getElementById('ev_web')?.value ?? '',
     contacte:            document.getElementById('ev_contacte')?.value ?? '',
     missatge_benvinguda: document.getElementById('ev_benvinguda')?.value ?? '',

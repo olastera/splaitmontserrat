@@ -62,6 +62,11 @@ $gps_override = is_gps_override();
 $ha_iniciat = ha_iniciat_ruta($user);
 $cal_modal_inici = !empty($settings['checkin']['codi_inici']) && !$ha_iniciat;
 
+$inici_ruta_iso = null;
+if (!empty($settings['event']['data_esdeveniment']) && !empty($settings['event']['inici_ruta_hora'])) {
+    $inici_ruta_iso = $settings['event']['data_esdeveniment'] . 'T' . $settings['event']['inici_ruta_hora'] . ':00';
+}
+
 // JSON per JavaScript
 $parades_json  = json_encode($parades_ruta);
 $checkins_json = json_encode($checkin_ids);
@@ -309,7 +314,17 @@ $nom_curt = explode(' ', $user['nom'])[0];
         </h5>
       </div>
       <div class="modal-body text-center">
-        <p class="text-muted">Introdueix el codi secret per començar la caminada.</p>
+        
+        <!-- Comptador (visible si encara no és l'hora) -->
+        <div id="comptador-container" class="comptador-container" style="display:none;">
+          <p class="text-muted mb-1">La caminada comença en:</p>
+          <div class="comptador-display">
+            <span id="comptador-val" class="fs-2 fw-bold text-spait">--:--:--</span>
+          </div>
+        </div>
+        
+        <!-- Formulari codi -->
+        <p class="text-muted" id="missatge-codi">Introdueix el codi secret per començar la caminada.</p>
         <div class="mb-3">
           <input type="text" class="form-control form-control-lg text-center text-uppercase"
                  id="codi-inici" placeholder="CODI SECRET" 
@@ -319,6 +334,17 @@ $nom_curt = explode(' ', $user['nom'])[0];
         <button class="btn btn-spait btn-lg w-100" id="btn-iniciar-ruta">
           <i class="bi bi-play-fill me-2"></i>Comença la caminada!
         </button>
+        
+        <!-- Separador -->
+        <div class="text-muted my-3">
+          <small>o bé</small>
+        </div>
+        
+        <!-- Botó logout -->
+        <a href="logout.php" class="btn btn-outline-secondary btn-sm w-100">
+          <i class="bi bi-box-arrow-left me-1"></i>Sortir / Tancar sessió
+        </a>
+        
       </div>
     </div>
   </div>
@@ -387,6 +413,7 @@ const ACABAT       = <?= json_encode($acabat) ?>;
 const GPS_REQUIRE  = <?= json_encode($require_gps) ?>;
 const GPS_RADI     = <?= (int)$gps_radi ?>;
 const CAL_MODAL_INICI = <?= $cal_modal_inici ? 'true' : 'false' ?>;
+const INICI_RUTA = <?= json_encode($inici_ruta_iso) ?>;
 
 // ============= MAPA LEAFLET =============
 const map = L.map('map', { zoomControl: true });
@@ -712,6 +739,49 @@ document.getElementById('btn-confirmar-checkin').addEventListener('click', () =>
 if (CAL_MODAL_INICI) {
     const modalInici = new bootstrap.Modal(document.getElementById('modalInici'));
     modalInici.show();
+    
+    if (INICI_RUTA) {
+        actualitzarComptador();
+        setInterval(actualitzarComptador, 1000);
+    }
+}
+
+function actualitzarComptador() {
+    if (!INICI_RUTA) return;
+    
+    const ara = new Date();
+    const inici = new Date(INICI_RUTA);
+    const diff = inici - ara;
+    
+    const comptadorContainer = document.getElementById('comptador-container');
+    const codiInput = document.getElementById('codi-inici');
+    const btnIniciar = document.getElementById('btn-iniciar-ruta');
+    const missatgeCodi = document.getElementById('missatge-codi');
+    
+    if (diff <= 0) {
+        if (comptadorContainer) comptadorContainer.style.display = 'none';
+        if (codiInput) codiInput.disabled = false;
+        if (btnIniciar) btnIniciar.disabled = false;
+        if (missatgeCodi) missatgeCodi.textContent = 'Introdueix el codi secret per començar la caminada.';
+        return;
+    }
+    
+    if (comptadorContainer) comptadorContainer.style.display = 'block';
+    if (codiInput) codiInput.disabled = true;
+    if (btnIniciar) btnIniciar.disabled = true;
+    if (missatgeCodi) missatgeCodi.textContent = 'Encara no és l\'hora! Esperem una mica...';
+    
+    const hores = Math.floor(diff / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const segs = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    const comptadorVal = document.getElementById('comptador-val');
+    if (comptadorVal) {
+        comptadorVal.textContent =
+            hores.toString().padStart(2, '0') + ':' +
+            mins.toString().padStart(2, '0') + ':' +
+            segs.toString().padStart(2, '0');
+    }
 }
 
 document.getElementById('btn-iniciar-ruta')?.addEventListener('click', function() {
@@ -723,6 +793,8 @@ document.getElementById('btn-iniciar-ruta')?.addEventListener('click', function(
         errorDiv.classList.remove('d-none');
         return;
     }
+    
+    this.disabled = true;
     
     fetch('iniciar_ruta.php', {
         method: 'POST',
@@ -738,11 +810,13 @@ document.getElementById('btn-iniciar-ruta')?.addEventListener('click', function(
             errorDiv.classList.remove('d-none');
             document.getElementById('codi-inici').value = '';
             document.getElementById('codi-inici').focus();
+            document.getElementById('btn-iniciar-ruta').disabled = false;
         }
     })
     .catch(function() {
         errorDiv.textContent = 'Error de connexió. Torna\'ho a provar.';
         errorDiv.classList.remove('d-none');
+        document.getElementById('btn-iniciar-ruta').disabled = false;
     });
 });
 
