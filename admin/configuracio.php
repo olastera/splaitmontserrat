@@ -314,6 +314,25 @@ $logo     = $vis['logo_local'] ?: ($vis['logo_url'] ?? '');
             <small class="text-muted">El codi mestre val per qualsevol parada. Útil per a admins o urgències.</small>
           </div>
 
+          <div class="mb-4 p-3 border rounded bg-light">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-flag-fill me-1"></i>Codi d'inici de ruta
+            </label>
+            <div class="input-group">
+              <input type="text" class="form-control text-uppercase" id="chk_codi_inici"
+                     value="<?= htmlspecialchars($chk['codi_inici'] ?? '') ?>"
+                     placeholder="Deixa en blanc per desactivar"
+                     style="letter-spacing:2px;">
+              <button class="btn btn-outline-secondary" type="button" onclick="generarCodiInici()">
+                <i class="bi bi-shuffle me-1"></i>Generar
+              </button>
+              <button class="btn btn-outline-secondary" type="button" onclick="toggleCodiInici()">
+                <i class="bi bi-eye" id="icon-codi-inici"></i>
+              </button>
+            </div>
+            <small class="text-muted">Paraula clau que els participants han d'introduir per activar la seva ruta.</small>
+          </div>
+
           <button class="btn btn-spait btn-lg" onclick="desarControl()">
             <i class="bi bi-floppy me-2"></i>Desar canvis
           </button>
@@ -398,6 +417,7 @@ function desarControl() {
     require_gps:  document.getElementById('chk_require_gps').checked,
     radi_metres:  parseInt(document.getElementById('chk_radi').value) || 200,
     codi_mestre:  document.getElementById('chk_codi_mestre').value.trim().toUpperCase(),
+    codi_inici:   document.getElementById('chk_codi_inici').value.trim().toUpperCase(),
   });
 }
 
@@ -450,6 +470,27 @@ function generarCodiMestre() {
   const inp = document.getElementById('chk_codi_mestre');
   inp.value = code;
   inp.type  = 'text';
+}
+
+function generarCodiInici() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  const inp = document.getElementById('chk_codi_inici');
+  inp.value = code;
+  inp.type  = 'text';
+}
+
+function toggleCodiInici() {
+  const inp  = document.getElementById('chk_codi_inici');
+  const icon = document.getElementById('icon-codi-inici');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.className = 'bi bi-eye-slash';
+  } else {
+    inp.type = 'password';
+    icon.className = 'bi bi-eye';
+  }
 }
 
 function toggleCodiMestre() {

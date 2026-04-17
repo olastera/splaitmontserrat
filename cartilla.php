@@ -4,6 +4,14 @@ require_once __DIR__ . '/includes/auth.php';
 
 require_login('index.php');
 
+function ha_iniciat_ruta(array $user): bool {
+    if (empty($user['checkins'])) return false;
+    foreach ($user['checkins'] as $ci) {
+        if (!empty($ci['inici'])) return true;
+    }
+    return false;
+}
+
 $user = current_user();
 if (!$user) {
     logout_user();
@@ -51,6 +59,8 @@ foreach ($parades_ruta as $p) {
 }
 
 $gps_override = is_gps_override();
+$ha_iniciat = ha_iniciat_ruta($user);
+$cal_modal_inici = !empty($settings['checkin']['codi_inici']) && !$ha_iniciat;
 
 // JSON per JavaScript
 $parades_json  = json_encode($parades_ruta);
@@ -288,6 +298,32 @@ $nom_curt = explode(' ', $user['nom'])[0];
   </div>
 </div>
 
+<!-- MODAL INICI RUTA -->
+<div class="modal fade" id="modalInici" data-bs-backdrop="static" 
+     data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header modal-header-spait">
+        <h5 class="modal-title">
+          <i class="bi bi-flag-fill me-2"></i>Activa la teva ruta!
+        </h5>
+      </div>
+      <div class="modal-body text-center">
+        <p class="text-muted">Introdueix el codi secret per començar la caminada.</p>
+        <div class="mb-3">
+          <input type="text" class="form-control form-control-lg text-center text-uppercase"
+                 id="codi-inici" placeholder="CODI SECRET" 
+                 style="letter-spacing:4px; font-size:1.3rem;" autocomplete="off">
+        </div>
+        <div id="inici-error" class="alert alert-danger d-none"></div>
+        <button class="btn btn-spait btn-lg w-100" id="btn-iniciar-ruta">
+          <i class="bi bi-play-fill me-2"></i>Comença la caminada!
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL CHECK-IN -->
 <div class="modal fade" id="modalCheckin" tabindex="-1" aria-labelledby="modalCheckinLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -350,6 +386,7 @@ const RUTA_USUARI  = <?= json_encode($ruta) ?>;
 const ACABAT       = <?= json_encode($acabat) ?>;
 const GPS_REQUIRE  = <?= json_encode($require_gps) ?>;
 const GPS_RADI     = <?= (int)$gps_radi ?>;
+const CAL_MODAL_INICI = <?= $cal_modal_inici ? 'true' : 'false' ?>;
 
 // ============= MAPA LEAFLET =============
 const map = L.map('map', { zoomControl: true });
@@ -669,6 +706,50 @@ document.getElementById('btn-confirmar-checkin').addEventListener('click', () =>
     }
   })
   .catch(() => alert('Error de connexió. Torna-ho a provar.'));
+});
+
+// ============= MODAL INICI RUTA =============
+if (CAL_MODAL_INICI) {
+    const modalInici = new bootstrap.Modal(document.getElementById('modalInici'));
+    modalInici.show();
+}
+
+document.getElementById('btn-iniciar-ruta')?.addEventListener('click', function() {
+    const codi = document.getElementById('codi-inici').value.trim().toUpperCase();
+    const errorDiv = document.getElementById('inici-error');
+    
+    if (!codi) {
+        errorDiv.textContent = 'Introdueix el codi secret.';
+        errorDiv.classList.remove('d-none');
+        return;
+    }
+    
+    fetch('iniciar_ruta.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codi: codi })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.ok) {
+            location.reload();
+        } else {
+            errorDiv.textContent = data.error || 'Codi incorrecte. Torna\'ho a provar!';
+            errorDiv.classList.remove('d-none');
+            document.getElementById('codi-inici').value = '';
+            document.getElementById('codi-inici').focus();
+        }
+    })
+    .catch(function() {
+        errorDiv.textContent = 'Error de connexió. Torna\'ho a provar.';
+        errorDiv.classList.remove('d-none');
+    });
+});
+
+document.getElementById('codi-inici')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('btn-iniciar-ruta').click();
+    }
 });
 </script>
 </body>
