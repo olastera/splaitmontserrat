@@ -219,6 +219,7 @@ if (empty($parada['rutes']) && isset($parada['ruta'])) {
 const IS_NEW    = <?= json_encode($is_new) ?>;
 const PARADA_ID = <?= json_encode($parada['id']) ?>;
 const INIT_PREGUNTES = <?= json_encode($parada['preguntes'] ?? []) ?>;
+const INIT_PARADES   = <?= json_encode($parades) ?>;
 
 // Toast
 const toastEl  = document.getElementById('toast-ok');
@@ -425,14 +426,7 @@ async function desarParada() {
   };
 
   // Obtenir la llista actual de parades i actualitzar / afegir
-  const respSettings = await fetch('../data/settings.json');
-  let allSettings;
-  try {
-    allSettings = await respSettings.json();
-  } catch(e) {
-    allSettings = { parades: [] };
-  }
-  const parades_act = allSettings.parades || [];
+  const parades_act = JSON.parse(JSON.stringify(INIT_PARADES));
 
   if (IS_NEW) {
     parades_act.push(parada_data);
