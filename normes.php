@@ -36,9 +36,36 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
   </header>
 
   <main class="normes-content container py-5">
+    <section class="normes-section">
+      <span class="normes-tag">00</span>
+      <h2 class="mb-3">Normes de convivència</h2>
+      <div class="normes-grid two-cols">
+        <div class="normes-card">
+          <h3 class="h5 mb-3">
+            <i class="bi bi-people-fill me-2" aria-hidden="true"></i>Generals
+          </h3>
+          <ul class="normes-list">
+            <?php foreach ($normes['normes']['generals'] as $rule): ?>
+              <li><?= htmlspecialchars($rule) ?></li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+        <div class="normes-card">
+          <h3 class="h5 mb-3">
+            <i class="bi bi-person-fill me-2" aria-hidden="true"></i>Adults
+          </h3>
+          <ul class="normes-list">
+            <?php foreach ($normes['normes']['adults'] as $rule): ?>
+              <li><?= htmlspecialchars($rule) ?></li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <?php if (!empty($normes['com_funciona'])): ?>
     <section id="com-funciona" class="normes-section">
-      <span class="normes-tag">00</span>
+      <span class="normes-tag">01</span>
       <h2 class="mb-3"><?= htmlspecialchars($normes['com_funciona']['titol']) ?></h2>
       <p class="mb-4"><?= htmlspecialchars($normes['com_funciona']['intro']) ?></p>
       <div class="normes-comfun">
@@ -58,7 +85,7 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
     <?php endif; ?>
 
     <section id="etapes" class="normes-section">
-      <span class="normes-tag">01</span>
+      <span class="normes-tag">02</span>
       <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
         <div>
           <h2 class="mb-1">Etapes de la ruta</h2>
@@ -81,7 +108,16 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
             <div>
               <strong><?= htmlspecialchars(($index + 1) . '. ' . $etapa['tram']) ?></strong>
               <?php if (!empty($etapa['notes'])): ?>
-                <p class="text-muted small mb-0"><?= htmlspecialchars($etapa['notes']) ?></p>
+                <p class="text-muted small mb-0"><?php
+                  $notes = htmlspecialchars($etapa['notes']);
+                  // Convertir URLs en enllaços clicables (després d'escapar)
+                  $notes = preg_replace(
+                    '/(https?:\/\/[^\s<]+)/',
+                    '<a href="$1" target="_blank" rel="noopener">$1</a>',
+                    $notes
+                  );
+                  echo $notes;
+                ?></p>
               <?php endif; ?>
             </div>
           </li>
@@ -90,7 +126,7 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
     </section>
 
     <section class="normes-section">
-      <span class="normes-tag">02</span>
+      <span class="normes-tag">03</span>
       <h2 class="mb-3">Què necessitem?</h2>
       <div class="normes-grid two-cols">
         <div class="normes-card">
@@ -129,35 +165,8 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
       </div>
     </section>
 
-    <section class="normes-section">
-      <span class="normes-tag">04</span>
-      <h2 class="mb-3">Normes de convivència</h2>
-      <div class="normes-grid two-cols">
-        <div class="normes-card">
-          <h3 class="h5 mb-3">
-            <i class="bi bi-people-fill me-2" aria-hidden="true"></i>Generals
-          </h3>
-          <ul class="normes-list">
-            <?php foreach ($normes['normes']['generals'] as $rule): ?>
-              <li><?= htmlspecialchars($rule) ?></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-        <div class="normes-card">
-          <h3 class="h5 mb-3">
-            <i class="bi bi-stars me-2" aria-hidden="true"></i>Tritons
-          </h3>
-          <ul class="normes-list">
-            <?php foreach ($normes['normes']['tritons'] as $rule): ?>
-              <li><?= htmlspecialchars($rule) ?></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-      </div>
-    </section>
-
     <section class="normes-section text-center">
-      <span class="normes-tag">05</span>
+      <span class="normes-tag">06</span>
       <h2 class="mb-3">Termos i preguntes</h2>
       <p class="lead mb-4">
         <?= htmlspecialchars($normes['termos']) ?>
@@ -167,6 +176,7 @@ $appName = $visual['nom_app'] ?? 'Cartilla del Pelegrí';
         <?php if ($contacte): ?>
           <p class="fw-semibold mb-4">
             Contacte oficial: <span class="text-primary"><?= htmlspecialchars($contacte) ?></span>
+            <br>Cotxes escombra: <span class="text-primary">Oscar (653791226)</span>
           </p>
         <?php endif; ?>
         <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
